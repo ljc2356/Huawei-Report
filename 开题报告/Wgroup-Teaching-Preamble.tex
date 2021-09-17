@@ -1,0 +1,126 @@
+% Greek lowercase letters, sans serif font - by Guido
+
+%\@ifpackageloaded{<name>}{<true>}{<false>}
+\usepackage{bm}
+
+
+%% =========== Euler ==========
+%\DeclareMathAlphabet{\matheur}{U}{eur}{m}{n}
+%\SetMathAlphabet{\matheur}{bold}{U}{eur}{b}{n}
+%\DeclareRobustCommand{\msf}[1]{%
+%  \ifcat\noexpand#1\relax\msfgreek{#1}\else\matheur{#1}\fi%for math sans serif (Euler)
+%}
+%% =========================
+%
+%% ==== Computer Modern Sans Serif ====
+\DeclareMathAlphabet{\mathsfbr}{OT1}{cmss}{m}{n}%for math sans serif (cmss)
+\SetMathAlphabet{\mathsfbr}{bold}{OT1}{cmss}{bx}{n}%for math sans serif (cmss)
+\DeclareRobustCommand{\msf}[1]{%
+  \ifcat\noexpand#1\relax\msfgreek{#1}\else\mathsfbr{#1}\fi%for math sans serif (cmss)
+}
+%% =========================
+
+% ==== Computer Modern Bright ====
+%% Part 1: This is necessary to fix a bug in the .fd file of the font!!!
+%\DeclareFontFamily{OT1}{cmbr}{\hyphenchar\font45 }
+%\DeclareFontShape{OT1}{cmbr}{m}{n}{%
+%  <-9>cmbr8
+%  <9-10>cmbr9
+%  <10-17>cmbr10
+%  <17->cmbr17
+%}{}
+%\DeclareFontShape{OT1}{cmbr}{m}{sl}{%
+%  <-9>cmbrsl8
+%  <9-10>cmbrsl9
+%  <10-17>cmbrsl10
+%  <17->cmbrsl17
+%}{}
+%\DeclareFontShape{OT1}{cmbr}{m}{it}{%
+%  <->ssub*cmbr/m/sl
+%}{}
+%\DeclareFontShape{OT1}{cmbr}{b}{n}{%
+%  <->ssub*cmbr/bx/n
+%}{}
+%\DeclareFontShape{OT1}{cmbr}{bx}{n}{%
+%  <->cmbrbx10
+%}{}
+%% Part 2
+%\DeclareMathAlphabet{\mathsfbr}{OT1}{cmbr}{m}{n}%for math sans serif bright (cmbr)
+%\SetMathAlphabet{\mathsfbr}{bold}{OT1}{cmbr}{b}{n}%for math sans serif bright (cmbr)
+%\DeclareRobustCommand{\msf}[1]{%
+%  \ifcat\noexpand#1\relax\msfgreek{#1}\else\mathsfbr{#1}\fi%for math sans serif bright (cmbr)
+%}
+%% =========================
+
+\makeatletter
+\newcommand{\msfgreek}[1]{\csname s\expandafter\@gobble\string#1\endcsname}
+\makeatother
+
+% Sans serif greek
+\DeclareFontEncoding{LGR}{}{} % or load \usepackage{textgreek}
+\DeclareSymbolFont{sfgreek}{LGR}{cmss}{m}{n}
+\SetSymbolFont{sfgreek}{bold}{LGR}{cmss}{bx}{n}
+\DeclareMathSymbol{\salpha}{\mathord}{sfgreek}{`a}
+\DeclareMathSymbol{\sbeta}{\mathord}{sfgreek}{`b}
+\DeclareMathSymbol{\sgamma}{\mathord}{sfgreek}{`g}
+\DeclareMathSymbol{\sdelta}{\mathord}{sfgreek}{`d}
+\DeclareMathSymbol{\sepsilon}{\mathord}{sfgreek}{`e}
+\DeclareMathSymbol{\szeta}{\mathord}{sfgreek}{`z}
+\DeclareMathSymbol{\seta}{\mathord}{sfgreek}{`h}
+\DeclareMathSymbol{\stheta}{\mathord}{sfgreek}{`j}
+\DeclareMathSymbol{\siota}{\mathord}{sfgreek}{`i}
+\DeclareMathSymbol{\skappa}{\mathord}{sfgreek}{`k}
+\DeclareMathSymbol{\slambda}{\mathord}{sfgreek}{`l}
+\DeclareMathSymbol{\smu}{\mathord}{sfgreek}{`m}
+\DeclareMathSymbol{\snu}{\mathord}{sfgreek}{`n}
+\DeclareMathSymbol{\sxi}{\mathord}{sfgreek}{`x}
+\DeclareMathSymbol{\somicron}{\mathord}{sfgreek}{`o}
+\DeclareMathSymbol{\spi}{\mathord}{sfgreek}{`p}
+\DeclareMathSymbol{\srho}{\mathord}{sfgreek}{`r}
+\DeclareMathSymbol{\ssigma}{\mathord}{sfgreek}{`s}
+\DeclareMathSymbol{\stau}{\mathord}{sfgreek}{`t}
+\DeclareMathSymbol{\supsilon}{\mathord}{sfgreek}{`u}
+\DeclareMathSymbol{\sphi}{\mathord}{sfgreek}{`f}
+\DeclareMathSymbol{\schi}{\mathord}{sfgreek}{`q}
+\DeclareMathSymbol{\spsi}{\mathord}{sfgreek}{`y}
+\DeclareMathSymbol{\somega}{\mathord}{sfgreek}{`w}
+\let\svarepsilon\sepsilon
+\let\svartheta\stheta
+\let\svarpi\spi
+\let\svarrho\srho
+\DeclareMathSymbol{\svarsigma}{\mathord}{sfgreek}{`c}
+\let\svarphi\sphi
+\DeclareMathSymbol{\sGamma}{\mathalpha}{sfgreek}{`G}
+\DeclareMathSymbol{\sDelta}{\mathalpha}{sfgreek}{`D}
+\DeclareMathSymbol{\sTheta}{\mathalpha}{sfgreek}{`J}
+\DeclareMathSymbol{\sLambda}{\mathalpha}{sfgreek}{`L}
+\DeclareMathSymbol{\sXi}{\mathalpha}{sfgreek}{`X}
+\DeclareMathSymbol{\sPi}{\mathalpha}{sfgreek}{`P}
+\DeclareMathSymbol{\sSigma}{\mathalpha}{sfgreek}{`S}
+\DeclareMathSymbol{\sUpsilon}{\mathalpha}{sfgreek}{`U}
+\DeclareMathSymbol{\sPhi}{\mathalpha}{sfgreek}{`F}
+\DeclareMathSymbol{\sPsi}{\mathalpha}{sfgreek}{`Y}
+\DeclareMathSymbol{\sOmega}{\mathalpha}{sfgreek}{`W}
+
+\DeclareRobustCommand{\mcal}[1]{%
+  \ifcat\noexpand#1\relax\mathnormal{#1}\else\cal{#1}\fi
+}
+\DeclareRobustCommand{\BM}[1]{%
+  \ifcat\noexpand#1\relax\bm{\boldUppercaseItalicGreek{#1}}\else\bm{#1}\fi
+}
+\makeatletter
+\newcommand{\boldUppercaseItalicGreek}[1]{\csname var\expandafter\@gobble\string#1\endcsname}
+\makeatother
+%-------------------------
+% Math symbol
+%-------------------------
+\newcommand{\rv}[1]{\MakeLowercase{\msf{#1}}}  
+\newcommand{\RV}[1]{\bm{\MakeLowercase{\msf{#1}}}}
+\newcommand{\RM}[1]{\bm{\MakeUppercase{\msf{#1}}}}
+\newcommand{\RS}[1]{\MakeUppercase{\msf{#1}}}
+
+\newcommand{\V}[1]{\bm{#1}}
+\newcommand{\M}[1]{\BM{#1}}
+\newcommand{\Set}[1]{\mcal{#1}}
+
+

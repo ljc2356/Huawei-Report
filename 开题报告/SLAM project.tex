@@ -1,0 +1,995 @@
+\documentclass[12pt]{article}
+\usepackage{setspace}
+\usepackage{ctex}
+\usepackage{indentfirst}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{mathrsfs}
+\usepackage{amsbsy}
+\usepackage{geometry}
+\usepackage{fancyhdr}
+\usepackage{graphicx}
+\usepackage{listings}
+\usepackage{color}
+\usepackage{xcolor}
+\usepackage{float}
+\usepackage{url}
+\usepackage{multirow}
+
+
+\usepackage{amsmath}
+\usepackage{amsmath,bm}
+\usepackage{amssymb}
+\usepackage{multicol}
+\usepackage{graphicx}
+\usepackage{epstopdf}
+\usepackage{booktabs}
+\usepackage{color}
+\pagestyle{empty}
+
+\usepackage{graphicx,graphics,epsfig,epstopdf,float}
+\usepackage{amsmath} % assumes amsmath package installed
+\usepackage{amssymb}  % assumes amsmath package installed
+\usepackage{mathrsfs}
+\usepackage{enumerate}
+\usepackage{subfigure}
+\usepackage{colortbl}
+\usepackage{color}  % make colors
+\usepackage{bm}
+\usepackage{psfrag}
+\usepackage{cite}
+\usepackage{algorithm}
+%\usepackage{algorithmic}
+\usepackage{algorithmicx}
+\usepackage{algpseudocode}
+\usepackage{mdwlist}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{acronym}  % make an acronym
+\usepackage{amssymb}
+\usepackage{bm}
+\usepackage{verbatim}
+\usepackage{appendix}
+\usepackage{makecell}
+
+\include{Wgroup-Teaching-Preamble}
+\graphicspath{{img/}} 
+
+
+
+
+
+
+\begin{document}
+\begin{spacing}{1.5}
+
+\begin{CJK*}{GBK}{song}
+\setlength{\parindent}{2em}
+
+
+\pagestyle{fancy}
+\title{\includegraphics[width=1in]{huawei.jpg}   \qquad    \includegraphics[width=1in]{tsinghua.jpg}\\
+	\Huge{基于非视距传播的高精度单站定位技术
+	}\\*}
+\author{\\  \\  \\ \Large{清华大学电子工程系}\\ \Large{信息系统研究所}\\ \Large{委托方：华为技术有限公司} \\合同编号：TC20210819006}
+\date{2021/09/13} 
+
+\maketitle
+%\thispagestyle{fancy}
+\clearpage
+\renewcommand{\contentsname}{目录}
+\tableofcontents
+\clearpage
+
+\section{背景介绍}
+
+随着物联网 (Internet of Things, IoT) 技术的发展，位置感知 (Location-Awareness, LA) 服务在智慧城市等领域的具体应用受到越来越广泛的关注。室内定位技术作为位置感知技术的代表，通过获取用户高精度、可信赖的位置信息，提供全过程的定位、导航与其他额外服务。
+非卫星定位手段在目前定位需求中亟待发展，近期也有大量的工作投入到这方面。常用的非卫星定位主要包括基于无线射频通信、惯性导航、视觉导航等方法，这些非卫星定位方法中，基于射频通信的测距方法应用最广，在此基础上发展出了基于到达时间 (Time-of-Arrival, TOA) 、 到达时间差 (Time-Difference-of-Arrival, TDOA) 和 (Angle-of-Arrival, AOA) 等传统的定位技术。但是基于射频的定位方法在复杂的环境下易受到非视距因素(Not Line of Sight,NLOS)的影响，从而限制了基于这些技术的应用的精度与鲁棒性。在常见的工业工厂、购物中心等环境中，狭窄的走廊、设备、人流都会成为动态、复杂的反射体与散射体，这对基于射频的定位技术提出了严峻的挑战。近几年来，利用环境信息提升定位性能的技术快速发展。通过提取信号中有效的多径成分(MPC),能够为基于直射径的定位技术提供冗余的信息，进而利用多源信息融合的办法提高定位系统的精度与鲁棒性。\\
+最近，利用环境信息提升定位性能的技术正在快速发展，这也将是未来重要的发展趋势之一。在无线宽带网络中，通过提取有效的多径成分 (Multipath Components, MPCs) ，实现同时定位和地图构建 (Simultaneous Localization and Mapping, SLAM) 。最近的研究表示，5G毫米波 (Millimeter Wave, mmWave) 大规模多入多出 (Massive Multiple-Input Multiple-Output, mMIMO) 通信系统具有这种提供环境信息的潜力\cite{MenMeyBauC19}。
+\subsection{现有定位技术}
+
+在本章中，将会对基于全球导航卫星系统 (GNSS) 和基于射频通信(Radio Frequency,RF)的定位方法给出详细的技术分析，同时也会简要涉及一些非测距的定位方法，例如融合惯性导航、视觉导航等发展较为成熟的定位方式。最后，对已有超宽带 (Ultra-Wide Band, UWB) 硬件平台进行介绍，并分析现有定位技术的发展趋势。
+
+\subsubsection{全球导航卫星系统}
+
+全球导航卫星系统是利用一组卫星的伪距、星历、卫星发射时间等观测量在地球表面或近地空间的任何地点为用户提供全天候的3维坐标和速度以及时间信息的空基无线电导航定位系统。我们以GPS 为例，对GNSS系统做技术分析\cite{Golestan2015Localization}。
+GPS系统由24颗均匀分布在高度为20200km的6个轨道面内的卫星组成，运行周期为11时58分，可发射L1(1575.4MHz) 和L2(1277.6MHz)频率信号。GPS的定位原理是通过测量卫星到用户的伪距来解算用户坐标。卫星不断向外发送自身的星历参数和时间等信息，当用户接收机同时接收到来自不同方位的4 颗卫星发出的信号时，经过距离测量和计算，即可解算出接收机的位置。原理示意图如Figure \ref{a} 所示：
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=4.5in]{GNSS.pdf}
+	\caption{GNSS示意图 }
+	\label{a}
+\end{figure}
+
+其中$\rho_i = \sqrt{ (x_i-x_0)^2 +(y_i-y_0)^2 +(z_i-z_0)^2 } = c\varDelta t_i $，即卫星到接收机的伪距，当同时接收到来自不同方位的4 颗卫星的伪距信息时，可以解算出接收机的坐标。
+
+\subsubsection{基于射频通信（RF）的定位方法}
+在室内外定位场景中，利用基于射频通信的无线测距技术可以实现对移动中节点的实时定位。目前所采用的技术主要有利用接收信号强度值 (Received Signal Strength Indicator, RSSI) 、到达时间 (Time of Arrival, TOA) 、到达时间差 (Time Difference of Arrival, TDOA) 、到达角度 (Angle of Arrival, AOA) 、到达频率差(Frequency Difference of Arrival, FDOA) 以及到达相位差 (Phase Difference of Arrival, PDOA) 等。
+
+a. 基于测距的定位方式
+
+RSSI测量的是接收信号强度，通过接收到的信号强弱来估计测定信号点与接收点的距离，进而通过测距信息来进行定位。在自由空间中，RSSI与收发设备之间的距离d 成平方成反比关系$P_r(d) = \frac{P_tG_tG_r\lambda^2}{(2\pi)^2d^2L}$。 通过上述公式我们可以在计算接受到的信号强度来估计传输距离，用测距计算得出定位。
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=4in]{rssi.png}
+	\caption{RSSI接收信号强度随距离变化示意图 }
+	\label{rssi}
+\end{figure}
+
+这种定位方法实现简单，成本低，但受传输距离、多径传输、NLOS (non line of sight，非视距)等多种因素的影响，RSSI 定位在实际定位中很难直接使用。
+
+TOA测量信号到达时间，锚点基站在接收到用户发出的信号之后做出反馈回应，用户在接收到基站的反馈信号后通过读取信号的时间戳确定信号往返的总时延，通过同时在多个基站测量移动台发射信号的时延，再根据多个距离确定的等距圆找到交点，确定移动台的位置。TOA检测方式要求严格的时钟同步，因此系统的设计复杂度较高，精度高，数据获取简单，应用十分广泛。
+
+\begin{figure}[H]
+	\begin{minipage}[t]{0.5\linewidth}
+		\centering
+		\includegraphics[width=2.5in]{toa.pdf}
+		\caption{TOA定位原理图}
+		\label{fig:TOA}
+	\end{minipage}%
+	\begin{minipage}[t]{0.5\linewidth}
+		\centering
+		\includegraphics[width=2.5in]{tdoa.pdf}
+		\caption{TDOA定位原理图}
+		\label{fig:TDOA}
+	\end{minipage}
+\end{figure}
+
+TDOA检测信号到达基站的时间差，通过检测三个不同的基站中的两个TDOA，联立解出由这两个TDOA决定的双曲线方程
+\begin{align}
+\sqrt{(x-x_1)^2+(y-y_1)^2}-\sqrt{(x-x_2)^2+(y-y_2)^2} =c(t_1-t_2)\notag\\ \sqrt{(x-x_3)^2+(y-y_3)^2}-\sqrt{(x-x_2)^2+(y-y_2)^2} =c(t_3-t_2)\notag
+\end{align}
+
+就能够将移动节点定位在双曲线的交点上。与TOA类似，TDOA定位易受环境影响，且在NLOS环境下的应用不佳。但TDOA仅需要对定位源进行时钟同步，这在实际部署中很容易实现，所以TDOA的应用要比TOA广泛。
+
+\begin{figure}[H]
+	\begin{minipage}[t]{0.5\linewidth}
+		\centering
+		\includegraphics[width=2.5in]{AOA.pdf}
+		\caption{AOA测角原理图}
+		\label{fig:side:a}
+	\end{minipage}%
+	\begin{minipage}[t]{0.5\linewidth}
+		\centering
+		\includegraphics[width=2.5in]{AOA2.pdf}
+		\caption{AOA定位原理图}
+		\label{fig:side:b}
+	\end{minipage}
+\end{figure}
+
+
+TDOA检测信号到达基站的时间差，通过检测三个不同的基站中的两个TDOA，联立解出由这两个TDOA决定的双曲线方程
+\begin{align}
+\sqrt{(x-x_1)^2+(y-y_1)^2}-\sqrt{(x-x_2)^2+(y-y_2)^2} =c(t_1-t_2)\notag\\ \sqrt{(x-x_3)^2+(y-y_3)^2}-\sqrt{(x-x_2)^2+(y-y_2)^2} =c(t_3-t_2)\notag
+\end{align}
+
+就能够将移动节点定位在双曲线的交点上。与TOA类似，TDOA定位易受环境影响，且在NLOS环境下的应用不佳。但TDOA仅需要对定位源进行时钟同步，这在实际部署中很容易实现，所以TDOA的应用要比TOA广泛。
+
+b. 基于非测距的定位方式
+
+基于射频通信的定位方法还有位置指纹(Location Fingerprint, LF)方法。LF定位是建立在信号传播对环境的依赖性这一特征之上。从WLAN的AP , RFID收发器、3G/4G基站等发射出的信号，在某一具体位置都会形成与周围环境密切相关的唯一信号传输特征(即“位置指纹”)，移动中的车辆将获得的本地位置指纹与样本数据库进行匹配，就可以确定当前的位置信息。这种定位技术能够克服传统定位方法易受到NLOS干扰的缺点，但其缺点是前期的工作量大，因为定位精度取决于位置指纹数据库的完整性，所以位置指纹数据库的建立需要针对实际环境进行科学测量，丰富数据库中的数据，而且数据必须随环境的变化及时更新，同时这也导致了鲁邦性差的缺点。
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=5in]{fp.pdf}
+	\caption{位置指纹定位示意图 }
+	\label{fp}
+\end{figure}
+
+\subsubsection{基于传感器的定位方法}
+
+惯性导航系统(Inertial Navigation System,  INS)是一种利用陀螺和加速度计测量载体角运动和线运动，经过积分运算求出载体瞬时姿态、速度和位置的导航设备，它只依赖于自身敏感器件信息，是一种完全自主的导航系统，因此具有隐蔽性好、抗干扰、不受任何环境和气象条件限制的优点。
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=2in]{IMU.pdf}
+	\caption{惯性导航示意图  }
+	\label{imu}
+\end{figure}
+
+视觉导航基于摄像头等视觉传感器，根据采集到的图像信息利用机器视觉等相关技术识别路径。依靠视觉所提供的实时信息可以与惯性导航等其他传感器进行融合，弥补自身传感器误差积累的缺陷，提高导航精度，这就衍生出了视觉惯性里程计（VIO）问题。
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=2in]{VR.pdf}
+	\caption{双目视觉导航定位示意图  }
+	\label{imu}
+\end{figure}
+
+传输视频信息要求较宽的传输带宽，而且对视频信息的处理导致对机器的计算能力有着较高的要求，对于设备有较高的依赖性，往往会受到处理器的运算速度和储存容量等限制。
+
+\subsubsection{定位技术小结}
+
+随着5G时代的到来，对于当下定位应用需要的高精度、低延时、高稳定性等特点，我们发展了不同的定位方法来满足这些定位需求，其中全球导航定位系统、基于射频通信的定位方法和惯导、视觉导航等信息融合方法发展较为成熟和完善，本文对这几种常见方法给出了较为详细的技术分析和优缺点概述，详见Table \ref{table1}。
+
+\begin{table}[h]
+	\caption{不同定位方法对比概览}
+	\vspace{0.3cm}
+	\label{table1}
+	\centering
+	\resizebox{\textwidth}{31mm}{
+		\begin{tabular}{ccccc}
+			\toprule
+			定位方式	& 定位技术	& 优点	& 缺点	& 定位精度 \\
+			\hline
+			\multirow{8}{*}{传统定位方式} & GNSS & 全天工作，方便快捷 & 恶劣电磁环境及室内不可用 & 较高 \\
+			& RSSI & 简单易行 & 定位精度差 & 低 \\
+			& TOA  & 数据获取简单  & 时钟同步要求高  & 较高  \\
+			& TDOA  & 降低时钟同步要求  & 需要基站数量多、病态拓扑定位性能低  & 高  \\
+			& AOA  & 无需时钟同步，定位精度高  & 需要特殊天线阵列  & 较高  \\
+			& RF  & 抗多径，抗非视距，定位速率快  & 需提前建立指纹库，维护成本高  & 高  \\
+			& 惯性导航  & 抗外界干扰  & 累积误差较大  & 中  \\
+			& 视觉导航  & 善于捕捉运动物体  & 抗遮挡能力差，通信带宽及硬件要求较高  & 较高  \\
+			\hline
+			\multirow{3}{*}{RF测距方式} & UWB  & 分辨率较高  & 作用距离短，功率限制高  & 较高  \\
+			& mmWave  & 体积小，分辨率高，抗干扰  & 易受雨雾影响，器件成本高  & 高  \\
+			& Laser  & 分辨率高，抗干扰  & 受天气影响大，探测效率低  & 高  \\
+			\bottomrule
+	\end{tabular}}
+\end{table}
+
+
+\section{NLOS径定位技术研究}
+\subsection{多径识别与估计方法}
+
+目前，针对不同的信号类型，已经有大量多径分解算法被提出并得到广泛应用。根据不同的无线通信技术、不同的定位系统设置，我们需要选取合适的多径分解算法来实现高精度的实时多径估计。下面我们介绍几类多径识别与参数估计算法。
+\subsubsection{基于特征分解的方法}
+波达方向（Direction Of Arrival,DOA)估计算法主要包括ARMA谱分析、最大似然法、熵谱分析法和特征分解法。其中以特征分解法应用最为广泛。特征分解法主要包括MUSIC算法、ESPRIT算法和WSF算法等。其中ESPRIT算法由于其在参数估计等方面的优越性，近些年来得到了广泛应用，并衍生出了诸如TLS-ESPRIT,SVD-ESPRIT,TLS-Pro-ESPRIT,波束空间ESPRIT(beamspqce ESPRIT)等算法。下面我们仅介绍最经典的LS-ESPRIT算法。
+
+ESPRIT算法假设一个包含$M$个阵元偶的任意平面天线阵列，每个阵元偶包含两个完全相同的相应特性的阵元，且两个镇元之间相差已知的位移矢量$\varDelta$。假定共有$K\le M$个独立的远场窄带信号同时以平面波的形式入射到本天线阵列。假设这些信号源具有相同的中心角频率$\omega_0$,且?ò$\omega_0$已知。此时将不同信号源用其DOA $\theta_k$来表征。除此之外，假设所有的$2M$个阵元上都有与信号独立的零均值，方差为$\sigma^2$的独立高斯随机过程。
+
+
+根据以上所假设的阵列的移不变特性，我们可以把阵列分为两个平移矢量为$\varDelta$的子阵$Z_x$和$Z_y$,其中子阵$Z_x$和$Z_y$分别由阵元偶的各自一半$x_1,x_2,...,x_M$和$y_1,y_2,...,y_M$成，每个阵元上所接收到的窄带信号可以表示为
+\begin{align}
+x_i(t)&= \sum_{k=1}^{K}s_k(t)a_i(\theta_k)+n_{xi}(t) \\
+y_i(t)&=\sum^{k}_{k=1}s_k(t)e^{j\omega_0\varDelta sin \theta_k/c}a_i(\theta_k)+n_{yi}(t),i=1,2,...,M
+\end{align}
+
+其中$s_k(t),k=1,...,K$为子阵$Z_x$的参考阵元接收到的第$k$个信号的波前，$\theta_k$为第$k$个信号的相对于位移$\varDelta$方向的到达方向。$a_i(\theta_k)$为任意一个子阵列的$Z_x$和oí$Z$的第$i$个阵元上的幅度响应。$n_{xi}(t)$和oí$n_{yi}(t)$分别为子阵的第$i$个阵元上的加性测量噪声。将两个子阵列的每个阵元t时刻的输出信号分别加以组合，可以得到两个子阵列的输号矢量表达式
+\begin{align}
+\bm{x}(t)=\bm{A}\bm{s}(t)+\bm{n}_x(t)\\
+\bm{y}(t)=\bm{A}\bm{\phi}\bm{s}(t)+\bm{n}_y(t)
+\end{align}
+
+其中矩阵$\bm{\phi}$为$K\times K$的对角矩阵，其对角元素为$K$个信号的波前的相位延迟，可以表示为
+\begin{align}
+\bm{\phi}=diag\{d_1,...,d_K\} = diag\{e^{j\omega_0\varDelta sin\theta_1 /c},...,e^{j\omega_0\varDelta sin\theta_K /c}\}
+\end{align}
+可见，如果能够得到$\bm{\phi}$矩阵，则由其对角元素既可以估计出信号到达角$\theta_k$
+把两个子阵的数据合并，构成整个阵列的输出信号矢量$\bm{z}(t)$为
+\begin{align}
+\bm{z}(t) = [\bm{x}^T(t),\bm{y}^T(t)]^T = \overline{\bm{A}}\bm{s}(t)+\bm{n}_z(t)\\
+\overline{\bm{A}}=\left[ {\begin{array}{*{20}{c}}
+	{\bm{A}}\\
+	{{\bm{A}}\bm{\phi} }
+	\end{array}} \right],\bm{n}_z(t)=\left[ {\begin{array}{*{20}{c}}
+	{\bm{n}_x(t)}\\
+	{{\bm{n}}_y(t)}
+	\end{array}} \right]
+\end{align}
+取$t=t_1,t_2,...,t_N$的$N$个时刻的数据组成数据矩阵，则上式可以表示为\begin{equation}
+\bm{Z} = \left[ {\begin{array}{*{20}{c}}
+		{\bm{X}}\\
+		{{\bm{Y}}}
+\end{array}} \right]=\overline{\bm{A}}\bm{S}+\bm{N}_z
+\end{equation}
+
+ESPRIT算法的基本思想是根据阵列的移不变特性而引起的信号子空间的旋转不变性，对数据矩阵$Z$进行研究，估计信号源的个数$K$以及各个信号的的到达角$\theta_k$。
+接收信号的自相关矩阵$\bm{R}$的特征分解为
+\begin{equation}
+\bm{R}_{zz}=\sum_{i=1}^{2M}\lambda_i \bm{e}_i \bm{e}_i^H=\bm{E}_s\bm{\varLambda}_s\bm{E}_s^H + \sigma^2\bm{E}_N\bm{E}_N^H
+\end{equation}
+
+其中特征值为$\lambda_1\ge\cdots\ge\lambda_K>\lambda_{K+1}=\cdots=\lambda_{2M}=\sigma^2$。$K$个较大的特征值对应的特征向量$\bm{E}_s=\bm{e}_1,\cdots,\bm{e}_K]$张成信号子空间。且$\mathcal{R}\{\bm{E}_s\}=\mathcal{R}\{\overline{\bm{A}}\}$,这就意味着存在一个唯一的非奇异的$K\times K$维满秩矩阵$\bm{T}$使得下式成立
+
+\begin{align}
+\bm{E}_s=\overline{\bm{A}}\bm{T}\\
+\bm{E}_s&=\left[ {\begin{array}{*{20}{c}}
+	{\bm{E}_X}\\
+	{{\bm{E}_Y} }
+	\end{array}} \right] = \left[ {\begin{array}{*{20}{c}}
+	{\bm{AT}}\\
+	{{\bm{A\phi T}} }
+	\end{array}} \right]
+\end{align}
+因此则有$\bm{E}_Y = \bm{E}_X\bm{T}_{-1}\bm{\phi T}=\bm{E}_X \bm{\varPsi}$,其中$\bm{\varPsi}=\bm{T}^{-1}\bm{\phi}\bm{T}$。以此可知，$\bm{E}_x$和$\bm{E}_y$张成相似的子空间，且矩阵$\bm{\phi}$的对角元素为$\bm{\varPsi}$的特征值。因此，在通过阵列输出采样值的相关函数$\hat{R}_{zz}=\frac{1}{N}\sum_{t=1}^{N}\bm{z}(t)\bm{z}^*(t)$来估计出$\bm{R}_{ZZ}$后，即可通过总体最小二乘准则计算出矩阵$\bm{\phi}$，得到信号的到达角度。
+
+\subsubsection{基于张量分解的方法}
+传统的信号处理方法都是建立在对矩阵模型的操作上展开，随着天线阵列的复杂化，尤其是多发多收(Multiple-Input Multiple-Output,MIMO)天线阵列的研究越来越深入，传统的基于矩阵的方法一般将多维信息拆解合并成为一个大矩阵进行处理，比如对其进行奇异值分解(Singular Value Decomposition,SVD),这种拆解合并的操作破坏了原始多维信息的原始结构特征，丢弃了部分有用信息，因此无法完全利用高纬度的结构信息。张量的方法能够自然地表示MIMO天线阵列的高纬度接收信息，张量具有独特的统计特性，并且张量分解通常具有较好的唯一可辨识性\cite{de2008decompositions}，能够保证原始信息。目前在MIMO阵列定位方面已有基于张量分解算法的相关研究\cite{haardt2008higher}\cite{li2013improved},在文献\cite{nion2009parafac}\cite{nion2009adaptive}中采用并行因子分析的方法来实现MIMO阵列的角度参数估计，也可以成为典型多因子分解(Canonical Polyadic Decomposition,CPD)。类似的方法还有Tucker分解和BTD(Block Term Decomposition)等类型，如图
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=5.5in]{Tensor.jpg}
+	\caption{常见的张量分解模型  }
+	\label{Tensor}
+\end{figure}
+针对目前MIMO天线阵列的多集接收信号，其在各自符合CPD模型的同时，彼此之间还包含有共同的因子矩阵，称之为耦合信息，这些包含耦合信息的张良信号可以用于基于耦合张量分解的算法来研究。耦合形式的张量可以呈现为多个张量的有序扩展，包括共享因子矩阵式的硬耦合，也包括统计相关式的软耦合。文献\cite{kiers1997three}研究了包含链式结构张量的平行因子分析法，文献\cite{sorensen2015coupled}\cite{sorensen2015coupled2}研究了基于共享因子矩阵的多张量符合耦合CPD和耦合BTD的情况，并讨论了唯一性问题和代数方法，可见，由于MIMO阵列在信号结构上的特殊性，使得基于张量分解的算法的应用有了很大的研究意义，其相对于传统特征分解算法具有更高的精度、更低的计算复杂度。
+
+\subsubsection{基于到达时间估计的方法}
+对于大带、高时间分辨率的信号，通过分析信道冲击响应（Channel Impulse Response，CIR)，我们可以获得丰富的多径信息，提取多径的反射源的位置，进而分析DOA,因此需要对多径的到达时间进行估计。目前，极大似然(Maximum Likelihood,ML)最常用的到达时间估计办法，可以通过硬件、软件的方式以匹配滤波器进行实现，以CLEAN算法\cite{clark1980efficient}为例，这种方法可以在已知发送信号时精确获取CIR中的各个多径分量，并易于扩展到其他场景。对于环境中出现的各种反射源、散射源，这些物体由于自身的复杂结构，往往使得反射信号产生畸变，且信噪比较低，传统方法难以充分利用并提取信号中的多径分量。为了解决以上问题，可对基于极大似然的匹配滤波器进行改进，以最大化其在低信噪比情况下的匹配峰值。
+
+假设$x_1$基站为发射源，$x_2$基站为接收机，发送接受的信号分别可分别表示为
+\begin{align}
+x_1(t) = s_1(t)+n_1(t)\\
+x_2(t) = \alpha s_1(t) + n_2(t)
+\end{align} 
+为了关注$x_1(t)，x_2(t)$信号的某些统计特征、频谱特征，可以在匹配滤波前分别对两路信号进行预滤波。通过对预处理滤波器$H_1,H_2$进行设计，可以满足不同场景不同条件下到达时间估计的需求。
+\begin{figure}[H]
+\centering
+\includegraphics[width=5in]{crossFilter.png}
+\caption{预滤波后的到达时间估计算法}
+\label{xzdw}
+\end{figure}
+\begin{table}[htbp]
+	\centering
+	\caption{预滤波器设计}
+	\label{tab:my-table}
+	\begin{tabular}{@{}cc@{}}
+		\toprule
+		Processor Name        & Weight \\ \midrule
+		Cross Correlation     & 1      \\
+		Roth Impulse Response & $1/G_{x_1x_1}(f)$      \\
+		SCOT                  & $1/\sqrt{G_{x_1x_1}(f)G_{x_2x_2}(f)}$      \\
+		PHAT                  & $1/|G_{x_1x_2}(f)|$      \\
+		Exkart                &  $G_{s_1s_1}(f)/[G_{n_1n_1}(f)G_{n_2n_2}(f)]$    \\
+		ML or HT              & ${|\gamma_{12}(f)|^2}/{|G_{x_1x_2}(f)|[1-|\gamma_{12}(f)|^2]}$      \\ \bottomrule
+	\end{tabular}
+\end{table}
+
+\subsection{多径关联算法}
+为了利用提取到的多径信息进行辅助定位，将多径信号从空间、时间上相互关联是必要的。已有研究结果表明，多径关联若出现问题将会导致定位精度严重下降。除此之外，对多径的观测虚警概率高、跟踪难度大，多径观测数目变化大，都对传统的多径关联算法提出了挑战。下面我们将介绍几种多径关联算法，对这些算法进行评估。
+
+\subsubsection{基于极大似然估计的方法}
+\label{likelihood}
+
+在获取了所有时延与角度测量集合（简称实际测量集合）后，需要将各组实际测量集合与虚拟基站ID进行关联，分清这些实际测量集合分别对应哪个虚拟基站。本报告提出了一种基于极大似然准则的多径关联方法，融合了用户坐标的先验信息。其核心思想为利用上一时刻的用户位置构建一组预测测量向量，该向量里的各时延与角度集合（简称预测测量集合）与基站ID 一一对应，将此预测测量集合与实际测量集合进行匹配，确定实际测量向量里的各实际测量集合与虚拟基站的对应关系，即实现多径关联。
+
+首先，在多径识别过程后，我们可以获取到实际测量向量
+\begin{align}
+\V{z} = [{\color{red}{\alpha}_1}, {\color{red}{\beta}_1},{\color{red} {\tau}_1 }, {\color{blue}{\alpha}_2},{\color{blue} {\beta}_2}, {\color{blue}{\tau}_2}, \cdots, {\color{magenta}{\alpha}_M}, {\color{magenta}{\beta}_M}, {\color{magenta}{\tau}_M} ]^{\rm{T}}
+\end{align}
+其中，下标不同（颜色不同）代表各组实际测量集合来自不同的虚拟基站，此时我们并不知道各组实际测量集合与哪个虚拟基站相对应。然后，根据上一时刻的用户位置构建预测测量向量
+\begin{align}
+\tilde{\V{z}} = [{\color{blue}\tilde{\alpha}_1}, {\color{blue}\tilde{\beta}_1}, {\color{blue}\tilde{\tau}_1}, {\color{red}\tilde{\alpha}_2}, {\color{red}\tilde{\beta}_2}, {\color{red}\tilde{\tau}_2}, \cdots, {\color{magenta}\tilde{\alpha}_L}, {\color{magenta}\tilde{\beta}_L}, {\color{magenta}\tilde{\tau}_L} ]^{\rm{T}}
+\end{align}
+其中，下标不同（颜色不同）代表各组预测测量集合来自不同的虚拟基站，此时各组预测测量集合与各虚拟基站的对应关系已知。式中$L$ 代表基站与虚拟基站的总数，由于当前可利用的基站数量小于等于总基站数，因此可能有$M\le L$，当$M<L$ 时取                                                                                                                                                                                                  \begin{align}
+N_{\min} = \min\{M,L\}
+\end{align}
+进一步，基于极大似然准则构建目标函数
+\begin{align}
+O_{N_{\min}} = \arg\min_{C_{M}^{N_{\min}} C_{L}^{N_{\min}} A_{N_{\min}}^{N_{\min}}} ||\V{\omega}_o\odot(\V{z}_{N_{\min}}-\tilde{\V{z}}_{N_{\min}})||_2
+\end{align}
+其中，$\V{\omega}_o$为权重向量，包含各测量值的权重，此权重值一方面用于归一化距离与角度单位，一方面用于降低精度较差的测量值的权重。上式的核心思想在于不断改变实际测量集合的排序，使得实际测量向量与预测测量向量最接近，此时得到最佳排序$O_{N_{\min}}$，即将实际测量向量里的各测量集合按照$O_{N_{\min}}$重新排序后，即可实现其与各虚拟基站ID 的一一对应，实现多径关联。
+
+但是，需要注意的是，这种基于极大似然估计的方法一方面计算量太大，使其难以满足我们所需求的低时延性，另一方面，对权重向量的设置将对关联结果影响较大。除此之外，这种方法难以应对多径数目动态变化较大的动态场景，且对虚警、漏检的情况考虑不足，因此难以应用于实际系统。
+
+
+\subsubsection{基于聚类的方法}
+目标跟踪算法大致可以分类点目标跟踪算法\cite{vo2015multitarget}和扩展目标跟踪算法\cite{granstrom2016extended},分别对应待检测目标最多产生一个观测点和待检目标形态产生多个观测点的情况。以毫米波雷达系统为例，其短波长可对行人、车辆、建筑等相对较大目标形成点云观测，且随着目标相对雷达位置、姿态的变化，点云的形态变化比较大，因此常常需要将扩展目标转化成点目标。且由于实际系统中，待观测的目标数目不固定，多径目标存在生灭现象，因此不能预先确定聚类的簇数目。DBSCAN是一种基于密度的聚类方法\cite{saxena2017review},这种聚类方法能够对位置数目的点云目标进行聚类，实现将多扩展目标检测转换为多点目标检测的过程。
+DBSCAN聚类是一种著名的密度聚类算法，从样本密度的角度来考虑样本之间的可连接性，并基于可连接样本不断扩展聚类簇来获得最终的聚类结果。DBSCAN使用一组关于“邻域”的参数$(e,MinPts)$来描述样本分布的紧密程度，$e$是目标点周围临近区域的半径，$MinPts$是临近区域内至少包含点的个数。DBSCAN算法的基本过程是先找到满足$e$邻域内至少有$MinPts$个点的点集作为原始族，然后通过不断扩展，把同样满足满足参数的点的点集作为原始簇，随后通过不断扩展，把同样满足参数$(e,MinPts)$的点集加入簇中，直到没有符合要求的点为止。DBSCAN算法流程如图\ref{DBSCAN}所示。
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=3in]{DBSCAN.png}
+	\caption{当$MinPts=3$时，虚线圆圈表示$e$邻域，经过不断扩展，蓝色样本被划分到同一簇中，红色样本被排除在外}
+	\label{DBSCAN}
+\end{figure}
+这种聚类方法只涉及了帧内的聚类。在一帧的数据中，近处的目标的点云较为丰富详实，而远处的目标由于检测点数目较少，且检测结果密集，多个目标的检测结果很容易混杂在一起，因此这种帧内聚类算法难以去除这些不利影响，会导致由于虚警导致的噪点和目标数据点无法分开，以及将远处仅含有一个检测点的目标当作噪点清除的不利情况。
+
+因此最近有学者提出了帧间DBSCAN聚类算法，首先初步筛选单独某一帧内的数据点的特征，随后合并多帧数据，此时每个监测点不光存在帧内的几何特征，还包括监测点所在的时间值以及时间的先后顺序特征。正常轨迹的位置与时间有密切的相关性，而虚警效应产生的噪点的分布情况和帧序特征相关性弱，甚至于完全无关。因此利用帧序特性可以区分出时间上特征值连续变化的轨迹数据和时间上特征值变化杂乱无章的虚警噪点。实验结果表明，这种方法相对于传统帧内DBSCAN聚类算法，在对多目标识别上的性能有显著的提升。
+
+
+\subsubsection{基于置信传播的方法}
+目前的定位系统对多径目标的观测可统一为多目标检测-匹配-跟踪问题。对于这类问题的研究可以使用贝叶斯模型统一表示，最常用的贝叶斯滤波器就是基于本模型的滤波算法，基于此有卡尔曼滤波器、粒子滤波器等一系列滤波算法得以实现。这类方法具有鲁棒性高、计算量小的特点。但是对于多径目标的匹配始终是传统滤波算法的短板，反射源散射源数目不确定，虚警概率高，都会严重影响滤波算法的收敛结果。而在节\ref{likelihood}中已经提到过，直接进行极大似然估计的方法，计算量大，且依赖初值的选择，在实际系统中应用困难。
+近些年来，随着对贝叶斯图的研究，基于置信传播(Belief Propagation,BP)算法\cite{leitinger2016belief}的目标匹配方法逐渐得到了重视。这种方法计算复杂度低，精度高，且模型易于拓展，可以被广泛地运用在目标检测、信号处理、视觉目标识别等各种方面。置信传播算法依赖于对似然函数的表示与分解，对模型建模时，需要对时序的状态变量、匹配参数等随机变量所构成的似然函数进行模块式的分解，并以此将整个似然函数建模成为贝叶斯因子图模型，如图\ref{factor}所示。随后，根据因子图模型迭代计算每条边上所传播的信息。这是基于匹配传播算法的核心步骤，通过逐边的计算，能够减少直接计算似然函数的计算复杂度。在匹配问题中，直接计算由多径的散射源和反射源的状态到匹配向量的信息计算复杂度稍大，因此有学者分别构造了由观测向量主导的匹配向量$\bm{b}_m$和由多径源主导的匹配向量$\bm{a}_m$\cite{meyer2015scalable}\cite{williams2014approximate}，二者可互相转换，分别在匹配向量的基础上描述了虚警和多径失去观测的情况，并以此在因子图中建立了环，在环上的置信传播算法可以通过迭代的方式来计算信息的近似值。最后汇总信息，即可计算出匹配向量的概率分布函数，获得对匹配结果的估计。
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=6.5in]{factor.jpg}
+	\caption{待测目标数目固定时的因子图模型:(a)单传感器单目标 (b)单传感器多目标 (c)单传感器多目标 (d)多传感器多目标}
+	\label{factor}
+\end{figure}
+
+但是，以上的基于置信传播的方法无法解决目标数目变化，即随着时间推移，周围环境变化而导致的反射源散射源数目变化的情况，当实际目标数目和预设目标数目失配，整个模型精度会发生极大变化，甚至趋于不收敛，将所有的检测都视为虚警的情况。\cite{leitinger2019belief}\cite{meyer2018message}提出了基于BP算法的SLAM算法，将所有的观测建模为潜在目标(Potential Target,PT),随着时间推移，已观测目标逐渐成为遗产潜在目标(Legacy PTs),并将新的观测作为新的潜在目标(New PTs)。这种方法为每个潜在目标存在概率这一随机变量，通过计算存在概率，并为其设置存在阈值，对潜在目标进行剪枝。这种方法可以随着环境的变化对更新旧目标，吸收新目标，适合多径目标跟踪的情况。
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=6.5in]{factor2.jpg}
+	\caption{单基站BP-SLAM算法因子图模型}
+	\label{factor}
+\end{figure}
+
+基于置信传播的多径匹配算法计算复杂度低，精度高，在点目标检测时具有优秀的性能。但是，在处理同一反射面产生多目标的情况时会将其识别成多个目标，从而无法充分利用来自同一目标的信息，引起精度下降。因此为了充分挖掘这种算法的潜力，对于扩展目标检测的多径情况还需要进一步研究。
+
+
+\subsection{NLOS误差校准方法}
+基于射频技术的定位系统大多依赖首达径对TOA、AOA进行估计。当直射径中途存在遮挡物，由于遮挡物的相对介电常熟、相对磁导率以及反射、折射等复杂因素的影响，投射波会产生色散、时延，使得接收机接收到的波形产生时延和畸变，使得回波信号的TOA产生正偏差，相位产生不可预知的影响。目前，利用统计的方法进行NLOS识别、利用传统机器学习的方式来估计时延误差（包括支持向量机、随机森林、多层感知机等算法）进行NLOS校准已经产生了大量的研究成果\cite{khodjaev2010survey}。
+
+\subsubsection{基于统计的NLOS误差校准方法}
+目前基于统计的有关NLOS误差的研究主要可分为两方面，NLOS识别技术和NLOS误差校准技术。图\ref{NLOSsurvey}描述了基于统计的NLOS误差研究的大主要分类。
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=6in]{NLOSsurvey.jpg}
+	\caption{NLOS误差校准方法分类}
+	\label{NLOSsurvey}
+\end{figure}
+NLOS信道识别算法主要包括以下三个方面：
+\begin{enumerate}
+	\item 基于距离估计的方法\cite{schroeder2007nlos}\cite{borras1998decision}。上面已经提到，NLOS信道将会对距离估计产生正偏差，而NLOS信道所特有的动态特性，此正偏差方差将会很大，因此可以通过假设检验的算法对此偏差进行建模并设置阈值，来判断是否处于NLOS信道。
+	\item 基于信道特征的方法\cite{guvenc2007nlos}。由于NLOS遮挡会被回波信号产生色散、时延,CIR能够很好的反应这些影响因素，通过分析平均时延、上升时间、信号幅值、信噪比等信道特征，能够对信道进行分类识别。
+	\item 基于地图信息的方法\cite{jo2006accuracy}。室内场景中，通过对历史定位结果分析预测当前位置，能够结合室内地图估计出当前用户所在的位置，判断是否处于NLOS信道中。
+\end{enumerate}
+NLOS误差校准主要包括以下三个方面：
+\begin{enumerate}
+	\item 直射径检测\cite{heidari2008identification}。当直射径被NLOS遮挡时，其直射径回波信号能量衰减，直射径回波能量将可能不是所有回波能量中最强的，因此基于最强能量信号搜索目标的算法将受到严重影响。这种误差检测方法通过统计的方法识别出直射径回波，以此获得更加准确的定位结果。
+	\item NLOS测距误差校准\cite{chen1999non}\cite{jiao2007lcc}。通过对NLOS信道误差进行建模，可以通过最小二乘、泰勒级数、线性规划、贝叶斯滤波等统计方法估计出该NLOS信道测距误差。
+\end{enumerate}
+通过上面的讨论可知，这种NLOS误差校准算法需需要一个高精度的误差生成模型，传统基于统计的方式的模型计算量小，能够在环境不太复杂，NLOS信道较少的情况下起到比较好的效果。但是这些建模比较简单，对于复杂情况下的NLOS信道难以产生有效的误差校正结果，除此之外，对于NLOS情况下复杂的多天线PDOA误差则因为信道模型过于复杂而难以得到应用。
+
+\subsubsection{基于传统机器学习的方法}
+\label{traditionLeanrn}
+基于统计方式的NLOS识别和校准算法主要存在以下三个缺点，(1)仅利用到了部分信道特征，没有充分利用CIR信息，也难以对信道特征的有效性进行区分，(2)在收集信息进行统计分析时产生明显时延,(3)基于信道特征对误差的概率分布函数建模困难。为了解决以上问题，一大批基于机器学习的方法得到提出，这些方法不需要一个明确的统计模型，具有更好的鲁棒性与精度。
+
+基于传统机器学习的方法仍然将NLOS校正的重点放在放在测距误差矫正上，主要通过从接收到的信号中提取特征，再通过机器学习的算法建立从特征到误差的端到端的误差校正模型。这些算法基于以下假设:（1）NLOS条件下，由于反射和散射的影响，直射径回波能量和幅度减小。（2）LOS条件下，直射径能量最强；NLOS条件下则可能某条多径能量最强，造成测距误差。（3） NLOS条件下接收到信号的时延的均方根更大。在这些假设下，机器学习法大多从接收信号$r(t)$中提取以下特征：
+\begin{enumerate}
+	\item Energy of received signal
+	\begin{align}
+	\mathcal{E}_r=\int_{-\infty}^{+\infty}|r(t)|^2 dt
+	\end{align}
+	\item Maximum amplitude of the received signal
+	\begin{align}
+	r_{max}=\mathop{max}\limits_{t}(t)
+	\end{align}
+	\item Rise time
+	\begin{align}
+	t_{rise} = t_H-t_L
+	\end{align}
+	其中$t_L=\mathop{min}\{t:|r(t)|\ge\alpha\sigma_n\}$,$t_H=\mathop{min}\{t:|r(t)|\ge\beta r_{max}\}$
+	\item Mean excess delay
+	\begin{align}
+	\tau_{MED}=\int_{-\infty}^{+\infty}t\psi(t)dt
+	\end{align}
+	其中$\psi(t)=|r(t)|^2/\mathcal{E}_r$.
+	\item RMS delay spread
+	\begin{align}
+		\tau_{RMS}=\int_{-\infty}^{+\infty}(t-\tau_{MED})^2\psi(t)df
+	\end{align}
+	\item Kurtosis
+	\begin{align}
+	\kappa=\frac{1}{\sigma^4_{|r|}T}\int_{T}[|r(t)|-\mu_{|r|}]^4 dt
+	\end{align}
+	其中，$\mu_{|r|}=\frac{1}{T}\int_{T}|r(t)|dt$,以及$\sigma^2_{|r|}=\frac{1}{T}\int_{T}[|r(t)|-\mu_{|r|}]^2 dt$
+\end{enumerate}
+通过这些特征，使用LS-SVM\cite{marano2010nlos}、决策树、随机森林的算法，通过提前对需求定位区域采集数据集并进行标注与训练，对NLOS$\setminus$LOS条件进行分类，并对误差进行回归。除此之外，近年来还出现了利用多源信息融合包括惯导、WIFI指纹来联合训练，以实现弱监督学习的目的\cite{wang2020semi}。
+
+\subsubsection{基于深度学习的方法}
+节\ref{traditionLeanrn}所提到的学习方法由于算法限制，对维度数目比较大，模型复杂的相位误差学习效果不佳，且算法泛化性能有待提升。为了解决这些问题，基于深度学习的生成式模型得以提出，这些方法大多属于数据驱动型的算法，并不需要研究人员在每个点上花费大量精力进行标注。只需要采集数量足够的数据，并对一小部分数据进行标注，就能引导模型自主从CIR中提取合理的特征，并根据标注的数据对特征进行选择，回归计算相位和测距结果误差。
+生成式模型主要由编码机和解码机构成。编码机负责将高维的多天线信号下采样，编码生成相关特征，解码机负责评估编码机所生成的特征的有效性，将特征值上采样解码生成原始的信号，并将解码的信号和原始信号比较相似程度。通过反复训练使得编码器达到要求后，将特征输入回归网络，生成误差结果。算法结构如图\ref{network}所示
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=6in]{network.jpg}
+	\caption{生成式误差校准模型}
+	\label{network}
+\end{figure}
+这种方法对人工标注需求少，不需要专门设计有效的特征值，能够以低成本实现端到端的误差回归模型。通过对编码机的设计，生成式模型的泛化能力明显高于其他传统算法，因此得到了广泛研究与关注。
+
+\subsection{NLOS融合的终端位置解算方法}
+相较于传统基于首达径（First Path,FP)的定位算法，对多径的观测可以为高精度定位系统提供冗余的位置信息，从而在首达径受到影响甚至完全失效的情况下为用户提供高精度定位服务。由于多径信息易丢失、易出现虚警的情况，传统的滤波算法可能会产生精度下降、收敛情况不好的现象，甚至在多源信息强耦合的情况下，某一多径的产生的错误估计会影响到对其他多径的观测，进而影响了整体的收敛情况。因此，对于NLOS融合的终端位置计算需要设计一种既能充分利用多径信息，又能及时排除错误信息的影响的弱耦合方法。
+\subsubsection{基于贝叶斯滤波器的方法}
+由于多径繁多且信号强度弱，因此提取到的多径信息存在大量非高斯的噪声，且噪声参数随着用户位置的变化而剧烈变化。因此我们希望得到一种能够用于动态环境的滤波器算法，在低计算成本的情况下有效利用多径信息辅助定位。围绕此问题，大量基于贝叶斯滤波器算法的研究结果被提出。
+EKF-SLAM算法是一种小规模场景下的SLAM算法\cite{hyun2020uwb}，这种算法以SLAM算法为基础，在首达径观测更新的基础上，迭代使用每一条多径数据迭代逐次对首达径的滤波更新结果进行更新，直到所有多径结果更新完毕后，得到最终对目标在此时刻的定位结果和对多径反射源的定位结果。这种方法无需对多径观测进行匹配，在计算机视觉领域已经得到了广泛的应用。
+
+但是，与计算机视觉领域不同，无线定位系统首达径易受到遮挡导致观测结果精度失准，且多径观测相比较于视觉锚点观测精度较低。这种算法以首达径作为其主滤波器，且与多径观测强耦合，因此在首达径观测失效，以及多径观测存在偏差时最终定位结果受到严重影响，鲁棒性较差。除此之外，在大规模场景下，EKF-SLAM算法要维护一个庞大的协方差矩阵，计算复杂度随目标数目的扩大而显著增大。
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=4in]{EKF-SLAM.png}
+	\caption{EKF-SLAM算法框图}
+	\label{xzdw}
+\end{figure}
+
+
+为了解决EKF-SLAM算法的问题，许多改进的滤波算法被提出。文献\cite{gentner2016multipath}提出了一种Channel-SLAM算法，这种方法实现了对多径信息的弱耦合，为每一条多径信息构建子滤波器，估计出反射面位置后再使用一个superPF估计用户位置。其中，每一级子滤波器使用粒子滤波器进行滤波，并在多级粒子滤波器的技术上推导了一些有用的结论可以大幅减少粒子滤波器的复杂度。其算法结构如图\ref{Channel-SLAM}所示。这种多级粒子滤波器算法能够对噪声复杂、数目不确定的多径信息进行有效跟踪。
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=5in]{Channel-SLAM.jpg}
+	\caption{Channel-SLAM算法框图}
+	\label{Channel-SLAM}
+\end{figure}
+
+
+在Channel-SLAM算法的基础上，这种多级子滤波器的结构值得被关注，我们提出了一种基于自适应卡尔曼滤波器的联邦滤波器算法，将匹配的多径子滤波器通过联邦滤波器算法耦合起来，并在子滤波器中增加了针对多径的故障检测算法，能够及时屏蔽错误的多径观测，并将各个子滤波器结果加权融合，实现低复杂度、高鲁棒性的滤波算法。
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=4in]{AEKF.jpg}
+	\caption{自适应联邦滤波算法框图}
+	\label{Channel-SLAM}
+\end{figure}
+
+
+\subsubsection{基于图优化模型的方法}
+以上EKF-SLAM算法、Channel-SLAM算法、自适应联邦滤波算法都属于贝叶斯滤波器，建模的基础是一阶马尔可夫性质，信息在每一时刻由上一时刻的状态变量向当前时刻的状态变量传递，这类算法具有计算复杂度低的特点。但是随着计算机视觉的逐年发展，运动结构恢复（Structure From Motion,SFM)和视觉SLAM技术渐渐意识到传统滤波算法已经不足以解决大规模路标锚点的高精度定位问题，而随着计算机计算能力的逐年提高，为计算复杂度妥协的马尔可夫假设逐渐成为限制了定位精度的瓶颈，目前的算力已经足够支撑同时对多个时刻的目标状态进行全局优化，甚至将数据采集完毕之后，离线时的对所有时刻的多目标锚点状态进行高精度的重构，其中最具有代表性的就是基于图模型的图优化算法。围绕着这种算法，出现了包括ceras、g2o等优化工具包，能够利用图模型的稀疏性对图优化算法大幅度加速，快速获得多点的定位结果。
+
+图优化算法的基础是贝叶斯图模型，图优化算法中设置有两类节点，第一类是随时间逐渐扩展的用户位置姿态节点，第二类是多径反射面节点，每个节点关联一个反射面。在实现多径匹配关联后，全局的似然函数可以表示为式\ref{eq.like}
+\begin{align}
+\label{eq.like}
+p(\bm{h}_{1:L_t,1:N},\bm{x}_{1:N}|\bm{x}_0,\bm{m}_{1:L_t}) = \prod_{n=1}^{N}p(\bm{x}_n|\bm{x}_{n-1}) \prod_{n=1}^{N}\prod_{l=1}^{L_t}p(h_{l,n}|\bm{x}_n,\bm{m}_l)\\
+p(\bm{h}_{1:L_t,1:N}|\bm{x}_{0:N},\bm{m}_{1:L_t}) \propto \prod_{n=1}^{N}p(\bm{x}_n|\bm{x}_{n-1}) \prod_{n=1}^{N}\prod_{l=1}^{L_t}p(h_{l,n}|\bm{x}_n,\bm{m}_l)
+\end{align}
+因此，运动与观测所构成的全局贝叶斯图可表示为图\ref{Bessiangraph}的形式。图模型中的边是可以通过传感器获得的观测，例如位置状态节点之间的运动关系可以使用匀速运动模型限制，位置状态节点与多径节点的边描述了观测结果的似然。全局的似然函数即为所有边所代表似然的乘积。
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=4in]{be2.pdf}
+	\caption{运动与观测过程中的贝叶斯图模型}
+	\label{Bessiangraph}
+\end{figure}
+以上的贝叶斯图模型具有以下稀疏性:在实际的多径系统中，同一时刻可以获得多条多径，随着时间推移会发生反射面坐标数目远大于用户位置坐标数目的情况，因此注意到，每一条观测值似然函数所代表的边仅与一个位置节点和一个多径节点有关。基于这个性质，可以推导全局观测的海塞矩阵如图\ref{Hessian}所示的稀疏性。在使用梯度下降法进行优化时，计算复杂度最大的步骤就是对海塞矩阵求逆。由于图\ref{Hessian}所描绘的稀疏性，对于该海塞矩阵求逆时可以先使用舒尔补将大量的多径节点边缘化，首先计算用户位置姿态的梯度，随后再计算多径姿态节点的梯度。以此可以使用梯度下降法，通过优化的方式，快速计算全局的用户位置状态。
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=3in]{Hessian.jpg}
+	\caption{全局观测的海塞矩阵}
+	\label{Hessian}
+\end{figure}
+这种基于贝叶斯图模型的算法可以以极高的精度一次计算整条轨迹上的用户位置，已经被广泛地应用在各种基于计算机视觉的SLAM和SFM问题上。目前由于多径观测的特殊性，以及现有实用多径关联算法不成熟的问题，图优化算法框架尚未应用于该问题。但是，图优化算法并非没有缺点,在随着时间推移，旧的目标已经不再出现在观测视野中时，我们不再希望对这些目标保持跟踪。但是，直接固定这些目标的值保持不动，则等效于边缘化了这些节点，从而影响了海塞矩阵的稀疏性，称之为填入(fill in)。目前可以通过构造姿态图、特殊的边缘化算法来规避这些问题。
+
+\section{项目计划与可行性分析}
+
+本章主要进行目标对齐，给出项目研究与实验验证计划，以及可行性分析。其中，可行性分析将基于已有UWB硬件平台实测信道数据。
+
+\subsection{项目计划}
+\subsubsection{研究内容}
+
+现有基于射频通信的无线定位系统在实际的工业工厂环境中，由于散射体较为丰富，无线定位精度受限因素之一就是LOS径不足，定位终端无法与基站建立视距连接。由于实际环境中NLOS径变化大、未知参数多，难以准确获取空间中散射反射体的位置信息，因此NLOS场景下的无线定位一直是无线定位技术中最具有挑战性的任务之一，主要难点主要有以下几点：
+\begin{enumerate}
+	\item 高精度的多径提取识别算法
+	\item 高精度、高鲁棒性的多径跟踪匹配算法
+	\item 自适应、低复杂度、高精度的多径融合定位算法
+\end{enumerate}
+
+本项目聚焦NLOS场景下的单站定位技术，通过高频信道的反射特性以及多天线技术，提取空间中的NLOS径信息，利用NLOS径实现终端的高精度定位。项目对基于NLOS径的单站定位的精度标准提出以下目标：
+\begin{itemize}
+	\item 基线：小于1米@$90\%$
+	\item 挑战：$0.4$米$90\%$
+\end{itemize}
+本项目研究内容包括：
+\begin{enumerate}
+	\item 高频NLOS信道特征实测分析与参数估计与关联算法
+	\item NLOS定位的精度理论分析与仿真验证
+	\item 定位精度实测与非理想因素的验证
+\end{enumerate}
+\subsubsection{技术路线}
+第一阶段，完成NLOS遮挡情况下，有额外镜面反射、散射下的多径识别、匹配、跟踪、融合定位SLAM算法设计。完成该部分的算法代码编写，完成项目中期报告一份，包括算法描述，时延验证结果，验证基于已有硬件平台的实测信道，预计花费6个月。
+
+第二阶段，拓展算法设计，优化算法，实测在无理想镜面反射的室内实际NLOS场景，如走廊、房间内部的多径识别、匹配、跟踪、融合定位SLAM算法结果。NLOS融合定位算法相比较于现有定位技术有标志性增强和技术突破。除此之外，进一步拓展优化算法。完成项目实测评估报告与分析文档一份。预计花费4个月。
+\subsubsection{技术方法}
+本项目目标是基于多径信息辅助甚至在恶劣环境下代替直射径进行定位，通过单基站系统对环境信息（包括反射源与散射源）进行交互，具体包括多径识别与跟踪，多径聚类匹配算法，多径辅助的NLOS融合定位算法研究。基于单站的NLOS融合定位系统架构如图\ref{system}所示
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=6in]{system.pdf}
+	\caption{系统整体流程}
+	\label{system}
+\end{figure}
+
+a.多径信号分离与估计
+
+根据已有超宽带多天线定位系统的信道特性，对基站发射信号、与各天线接受信号进行统计。$n$时刻的本地存储信号$r_0$与第$i$根天线(共计$I根天线$)信道脉冲响应$r_i$表示如下
+\begin{align}
+	r_0(n)&=s_0(k)+n_0(n)\\
+	r_i(n)&=\sum_{l_n=0}^{L_n}\alpha_{l_n} s_0(k-\tau_{l_n})+n_i(n),i=1,\cdots,I
+\end{align}
+其中$L_n$是$n$时刻多径反射源的数目，$\alpha_{l_n}$是第$l_n$条多径的能量衰减系数，$\tau_{l_n}$是多径时延。$l_n=0$为首达径，$l_n>0$为多径。通过对比基于特征提取的方法、基于谱估计的算法、基于到达时间检测的算法，从接收信号中提取首达径、多径信号，获得对各个首达径、多径信号测距、测角的估计$z_{l_n}=[d_{l_n},\theta_{l_n}]^T$。其中，对多径信号的测角可视为虚拟标签对基站发送的信息。
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=4in]{mirror.pdf}
+	\caption{虚拟标签映射}
+	\label{mirror}
+\end{figure}
+
+其中每个虚拟标签位置$\bm{p}_{l_n}$与标签位置$\bm{p}_{l_n=0}$和对应的反射面参数$[b_{l,n},\beta_{l,n}]^T$有关，$b_{l,n}$表示反射面相较于基站的垂直距离，$\beta_{l,n}$表示反射面相比基站$x$轴的角度。
+
+b 多径聚类与多径匹配算法
+
+以上所获得的各个多径信息包含扩展目标信息，即观测到的多个虚拟标签是由于一个反射面产生的，以及存在虚警问题。因此需要实用聚类和匹配技术将扩展目标关联为点目标，并将多径观测从时间、空间上关联起来，为融合算法提供时间、空间一致性。
+
+获得多径观测集合$[d_{l_n},\theta_{l_n}]^T,l_n=1,\cdots,L_n$后，首先通过帧间DBSCAN聚类，将扩展目标转化成点目标。$[d_{l_n},\theta_{l_n}]^T,l_n=1,\cdots,L_n$为单独一帧内的数据点的特征，如果合并多帧数据进行批处理，则为每个多径检测点增加其所在时间序列的序列值，即扩展多径数据为$[d_{l_n},\theta_{l_n}]^T,l_n=1,\cdots,L_n$。将扩展的时间特征成为帧序数$F$。利用帧许特征，可以区分出时间特征值上连续变化的轨迹数据和时间上特征值变化杂乱无章的多径效应噪点。经过帧间DBSCAN匹配后$n$时刻的多径观测集合表示为$[d_{pt_n},\theta_{pt_n}]^T,pt_n=1,\cdots,PT_n$，表示经过多径聚类，每个多径观测点都是一个潜在目标(Potential Target)。
+
+在通过聚类将扩展目标合并后，还仅是把多径数据初步地从几何角度关联了起来，时间上的关联还存在不足。首先，聚类后的目标仅是一个个坐标，并没有将多径目标和随时间推移本地存储的反射面地图信息匹配起来，除此之外，由于多径信息经常丢失观测，如果仅使用聚类算法，系统将会把消失又出现的多径目标识别为新的目标，从而放弃了使用已有的先验信息，影响了融合算法定位精度。
+
+设初始时刻$n=0$时PT的数目为零，且将每个时刻的潜在目标集合扩维成为$[d_{pt_n},\theta_{pt_n},r(pt_n)]^T,pt_n=1,\cdots,PT_n$,其中$r(pt_n)$是该PT存在的概率。随后为了将当前时刻的PT和本地存储的历史信息匹配起来，将上一时刻所有的PTs设置为Legacy PTs,当前时刻所观测的所有的PTs设置为New PTs。随着时间推移，每个时刻所有的Legacy PTs的数目为$j_n$,PTs的数目将随每个时刻的观测增长，因此在估计出$r(pt_n)$后需要根据其大小进行剪枝，去除那些存在概率较低的目标。根据Legacy PTs和New PTs各自设计匹配向量
+
+Legacy PTs导向的匹配矢量
+\begin{align}
+\bm{a}_n &\triangleq [a_n^{(1)},a_n^{(2)},\cdots,a_n^{(j_n)}]^T\\
+a_n^{(j)}&\in\{0,1,2,\cdots,PT_n\}
+\end{align}
+$a_n^{(j)}=0$表示旧的Legacy PT在当前时刻的所有观测中没有匹配的结果，失去了对旧目标的观测。$a_n^{(j)}=pt_n$表示Legacy PTs与当前时刻第$pt_n$个观测匹配。
+
+New PTs导向的匹配矢量
+\begin{align}
+\bm{b}_n \triangleq [b_n^{(1)},b_n^{(2)},\cdots,b_n^{(PT_n)}]^T\\
+b_n^{(pt_n)} \in {0,1,2,\cdots,j_n}
+\end{align}
+$b_n^{(pt_n)}=0$表示新的观测中与旧的所有目标没有观测，描述虚警的情况。$b_n^{(pt_n)}=j$表示新的观测中与第$j$个旧目标产生观测。
+
+为了保证点目标估计的唯一性，需要做出以下唯一性假设：每个反射面最多产生一个点目标观测，每个点目标观测最多由一个反射面产生。该唯一性假设可以表示为
+\begin{align}
+\bm{\varPsi}(\bm{a}_n,\bm{b}_n) \triangleq \prod_{j}^{j_n} \prod_{pt_n}^{PT_n} \bm{\Psi}_{j,pt_n}(a_n^{(j)},b_n^{(pt_n)}) 
+\end{align}
+\begin{align}
+\bm{\Psi}_{j,pt_n}(a_n^{(j)},b_n^{(pt_n)}) \triangleq \left\{ {\begin{array}{*{20}{c}}
+	0,\ a_n^{(j)}=pt_n,b_n^{(pt_n)}\neq j\ or\ b_n^{(pt_n)}=j,a_n^{(j)}\neq pt_n\\
+	1,\ otherwise
+	\end{array}} \right.
+\end{align}
+若$\bm{\varPsi}(\bm{a}_n,\bm{b}_n)=0$则该匹配向量概率为零。
+
+通过置信传播算法计算出这些匹配矢量的概率质量函数(Probability Mass Function，PMF)，通过分析此PMF可以得到准确的匹配矢量，将观测和目标匹配起来。
+
+\subsubsection{NLOS融合SLAM定位算法}
+在基于高精度多径匹配的结果的基础上可以进行NLOS融合SLAM定位算法。本项目计划基于g2o框架进行开发。g2o是一个开源的C++非线性图优化算法框架，能够基于贝叶斯图模型对节点变量进行优化。由于基于多径的融合算法能够用位置节点、多径节点和多径观测所构成的边进行表示。基站对于标签的首达径观测可以视为从位置节点出发到位置节点的一元边。g2o的优化结果是基于贝叶斯图模型所表示的模型的极大似然估计。
+
+对于图\ref{Bessiangraph}所描述的描述，位置节点主要为其空间位置坐标与速度$\bm{p}_n=[x_n,y_n,z_n,\\v_{x_n},v_{y_n},v_{z_n}]^T$，反射面节点为其姿态变量$[d_l,\theta_l]^T$,贝叶斯图中主要有两种边，位置节点之间的边由运动模型$f(\bm{p}_n|\bm{p}_{n-1})$所描述。假设用户在两个采样时刻之间匀速直线运动，运动噪声服从高斯分布,即
+\begin{align}
+f(\bm{p}_n|\bm{p}_{n-1})\sim\mathcal{N}(\bm{A}\bm{p}_{n-1},\bm{\sigma}_q^2)\\
+\bm{A} = \left[ {\begin{array}{*{20}{c}}
+	1&0&0&1&0&0\\
+	0&1&0&0&1&0\\
+	0&0&1&0&0&1\\
+	0&0&0&1&0&0\\
+	0&0&0&0&1&0\\
+	0&0&0&0&0&1
+	\end{array}} \right]
+\end{align}
+对多径的观测可以视为对虚拟基站$\bm{p}_{l_n}=[x_{l_n},y_{l_n},z_{l_n}]$的观测$\bm{z}_{l_n}$
+\begin{align}
+\bm{z}_{l_n}\sim\mathcal{N}(h(\bm{p}_{l_n}),\bm{\sigma}_R^2)\\
+h(\bm{p}_{l_n})\triangleq\left\{ {\begin{array}{*{20}{c}}
+	\sqrt{x_{l_n}+y_{l_n}+z_{l_n}}\\
+	arctan(\frac{y_{l_n}}{x_{l_n}})\\
+	arctan(\frac{z_{l_n}}{\sqrt{x_{l_n}^2 + y_{l_n}^2}})
+	\end{array}} \right.
+\end{align}
+将对多径观测边和位置节点之间的匀速运动模型输入图模型可进行求解，如果每个时刻进行一次优化，图优化算法则原理上等效滤波算法。为了保证精度，使用滑动窗口法，每次选取一批数据进行优化，完成一次优化得到位置姿态坐标和多径节点坐标。为了保持海塞矩阵在优化过程中保持图\ref{Hessian}所描述的稀疏性，需要对滑动窗口优化算法在多径融合定位的背景下进行设计，综合考量。
+
+\subsection{可行性分析}
+本节将基于已有的超宽带多天线单基站定位系统对当前的技术路线和技术方法进行实测验证，主要包含多天线单基站定位系统、基于天线阵列的测距测角、基于单基站的定位方法、多径信号成分分析、基于多径信号的测距与测角、基于多径信号的匹配方法、NLOS辅助定位验证。
+\subsubsection{多天线单基站}
+
+清华大学项目组对基于超宽带传输的多天线单基站进行设计和研究，已开发了一套能够进行超宽带信号传输、测距、测角的硬件系统，该系统由多天线单基站和定位标签组成。多天线单基站如Figure \ref{anchor} 所示。硬件信号传输符合IEEE 802.11要求，具有低能耗、高速率、高精度的特点，同时能做到多路信号同步，保证天线阵列相干接收性能。同时较市场中定位方案成本更低，拓扑更小，保证定位精度。
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=2in]{base.jpg}
+\caption{八天线单基站}
+\label{base}
+\end{figure}
+
+
+同时，基站可提供超宽带信道脉冲响应(CIR) ，具有1ns的高分辨率，同时CIR中可提取多径信道信息。定位基站能够提供分米级至厘米级定位精度，刷新频率高于50Hz。该多天线单基站将作为单基站SLAM实验数据采集和算法验证的硬件平台。
+
+
+\subsubsection{基于天线阵列的角度测量}
+
+如上文所述，本实验系统是基于超宽带传输的硬件，具体包含UWB定位基站和UWB定位标签。
+\begin{figure}[H]
+\centering
+\includegraphics[width=3in]{tag.jpg}
+\caption{基站与标签示意图}
+\label{cir}
+\end{figure}
+\begin{figure}[H]
+\centering
+\includegraphics[width=3.5in]{cir111.pdf}
+\caption{信道脉冲响应示例}
+\label{cir}
+\end{figure}
+
+其中超宽带信号符合IEEE 802.11 标准，基站端配有天线阵列，基站天线数目可调，通信信道可调，原则上天线数量大于两根即可实现全向测角。实验中选用三根天线。标签与天线进行TOF测距，同时在基站端记录各天线阵元的接收信号波形，波形的实例如Figure \ref{cir} 所示。
+
+通过到达时间检测算法确定信号的到达时间戳、到达相位，根据多路信号的相位差分值计算信号到达角度，图中所示波形即为信道脉冲响应(Channel Impulse Response, CIR)，它是一个复数序列，采样间隔$1ns$。下面进行两组实验验证超宽带天线阵列的测角精度，首先介绍实验场景。在水平方向角测试过程中，我们将基站放置在原点处，标签距离基站五米远，两者高度均为1.5米，环境为一般室内复杂环境，将标签绕基站旋转，每隔10度记录200组数据，记录角度的均方根误差(RMSE) ，水平方向角的RMSE曲线如Figure \ref{theta}所示。
+\begin{figure}[H]
+\centering
+\includegraphics[width=3.5in]{thetacrb4.eps}
+\caption{水平方向角测量精度示意}
+\label{theta}
+\end{figure}
+
+其中，红色线条为克拉美罗下界(CRLB)，表达了理论上该系统角度测量方差的最小值。从图中可以发现，超宽带天线阵列的方向角测角均方根误差能够小于1 度，具备高精度定位的潜力。
+
+在俯仰角测试过程中，保持方向角不变，将标签逐渐抬高，俯仰角的RMSE曲线如Figure \ref{beta} 所示。其中，红色线条为俯仰角测量的CRLB，从图中可以发现，俯仰角的估计精度也比较高，但由于天线阵列是圆形平面阵，其对俯仰角的变化不敏感，但仍然具有高精度三维定位的潜力。
+\begin{figure}[H]
+\centering
+\includegraphics[width=3.5in]{betacrb3.eps}
+\caption{俯仰角测量精度示意}
+\label{beta}
+\end{figure}
+
+通过对已有天线阵列UWB硬件的测试，可以总结以下结论：
+
+\begin{itemize}
+  \item 清华实验室已有UWB测试平台融合了阵列天线与UWB硬件，理想视距情况下能够实现1度左右的测角精度。
+  \item 已有UWB测试平台能够实现平面全向测角以及一定程度上的三维测角。
+\end{itemize}
+
+\subsubsection{基于单基站的定位}
+
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=4in]{SPEB7.eps}
+\caption{定位精度对比}
+\label{SPEB}
+\end{figure}
+基于上述UWB定位系统，我们引入距离测量信息，实现运动节点的定位和跟踪。我们将基站放置在原点，高度为1.5米，将标签放在5米远处，高度同样为1.5米。将基站放置在以转台上匀速转动，模拟行人绕基站匀速运动，对比实际定位结果和理论结果。在实际系统中，通常需要为运动轨迹设计运动模型，以实现滤波定位。定位精度的对比图如Figure \ref{SPEB} 所示。
+
+图中蓝线是未加滤波算法的结果，红线是增加滤波算法的结果，实线是实际数据结果，虚线是定位方差的理论下限。可见UWB系统的定位误差能够达到20cm 以内。实际定位过程的俯视图如Figure \ref{Tracking} 所示。
+\begin{figure}[H]
+\centering
+\includegraphics[width=3.5in]{Tracking11.eps}
+\caption{定位结果}
+\label{Tracking}
+\end{figure}
+
+其中，蓝线是真实轨迹，绿线是未加滤波算法的定位结果，红线是滤波后的定位结果。由于测距误差一般小于10cm，因此实际定位精度较为准确。至此，本小节验证了使用UWB单基站实现定位的实际性能与潜力，类比使用5G单基站进行定位，推测实际性能相近。通过对已有UWB硬件平台的测试，可以总结以下结论：
+
+\begin{itemize}
+  \item 基于清华实验室已有的UWB测试硬件平台，能够实现分米级的定位精度。
+  \item 基于已有实验平台，能够实现不同天线数量下定位性能对比。
+  \item 当前UWB硬件平台的定位性能对分析5G系统室内定位性能具有参考意义。
+\end{itemize}
+
+\subsubsection{多径信号成分分析}
+\label{mcpAn}
+
+在验证了基于超宽带单基站系统的首达径定位方案之后，我们希望进一步挖掘多径的信息。我们将展示多径情况下的超宽带信道冲激响应，以及相应的多径识别效果。
+
+我们依然采用UWB定位系统，其中信号载频频率采用802.11所确定的二信道，中心频率为3.9936GHz，带宽为499.2MHz，理论上能够分辨距离差为$1m$以上的虚拟基站。为了验证室内场景下的多径分辨能力，我们在罗姆楼11-201实验室进行实验。在实验中，分别验证了具有首达径与使用铝箔纸板将首达径进行遮挡(经过验证，这种铝箔纸板对超宽带首达径信号具有明显干扰作用)的效果。实际测试环境如图所示
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=5in]{realSystem.jpg}
+\caption{罗姆楼11-201实际场景}
+\label{realSystem}
+\end{figure}
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=3.5in]{CAD.pdf}
+	\caption{罗姆楼11-201地图}
+	\label{map}
+\end{figure}
+在用户的运动过程中，我们分别收集了LOS与NLOS情况下的信道脉冲响应，观察所收集到的多径信号分别如图\ref{reflect1}和图\ref{reflect2}。首达径为$8ns$处的峰值。可见，由于首达径信号一般能量较大，因此在LOS情况下，首达径信号比多径信号能量要高，其信号波形会对能量较小的多径信号造成影响。而在NLOS情况下，首达径信号受到影响，多径信号相对能量较高，更易从CIR中提取出来。本实验旨在验证多径能否被正确接收，实验表明UWB系统的多径信号能够被正常接收，且具备开发和利用的潜力。通过对已有UWB硬件平台的测试，可以总结以下结论：
+
+\begin{itemize}
+	\item 基于清华实验室已有的UWB测试硬件平台，能够正确接收UWB多径信号。
+	\item 当前UWB测试平台能够将实测多径数据与理论情况相对应。
+	\item NLOS情况下，多径信息更加准确可靠，具有挖掘的潜力。
+\end{itemize}
+
+\begin{figure}[H]
+\begin{minipage}[t]{0.5\linewidth}
+\centering
+\includegraphics[width=2.9in]{losCIR.jpg}
+\caption{LOS情况下的CIR模值}
+\label{reflect1}
+\end{minipage}%
+\begin{minipage}[t]{0.5\linewidth}
+\centering
+\includegraphics[width=2.9in]{nlosCIR.jpg}
+\caption{NLOS情况下的CIR模值}
+\label{reflect2}
+\end{minipage}
+\end{figure}
+
+
+\subsubsection{基于多径信号的测距与测角}
+
+
+在验证了多径信号能够被接收机记录并识别后，我们需要验证室内多径信号的质量，确保室内多径信息的可靠性。在本节中，我们使用到达时间的检测的方法提取出多径出现的位置，并将每条多径的时延和相位提取出来，与实际值进行对比，从而验证多径信号能否被实际利用。这里仅对多径质量进行定性的分析，仅说明在常规算法的基础上就可以得到基本实用的多径信息。
+
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=3in]{mpcMap.pdf}
+\caption{多径点位地图}
+\label{mpcMap}
+\end{figure}
+
+在以上图中的五种场景中，具体分析反射板位置、标签位置变化时多径信号的质量。由于室内多径场景较多，因此仅采用识别出的由房间右侧墙壁所反射的多径信息进行分析，这些多径信息可以通过对虚拟标签位置进行限定得到。具体测量结果如Table \ref{measure} 所示。
+\begin{table}[h]
+\caption{虚拟标签入射角测量}
+\vspace{0.3cm}
+\resizebox{\textwidth}{19mm}{
+\label{measure}
+\centering
+\begin{tabular}{ccccccccc}
+\toprule
+INDEX	& FPindex	& FPaoa	& FPaoastd	& FPaoaturth & SPindex  & SPaoa  & SPaoastd  & SPaoaturth    \\
+\hline
+  A & 8& 1.3204  & 	     1.0499&	0  &	17&	-70.6187&	5.0034&	69.4440  \\
+  B & 8& 1.2766  &       1.4127&	0  &	15& -54.3836&	5.5501&	57.9946  \\
+  C & 8& 1.9275  &       1.3069&	0  &	    14&	-50.9117&	8.4304&	48.8141  \\
+  D & 8& 27.1350 &		 4.4918&	23.6294&17&	-60.9562&	10.2021&	-55.1755   \\
+  E & 8& 44.0389&		3.2026&	41.1859&	19&	-69.7745&	9.2913 &-61.9275    \\
+
+\bottomrule
+\end{tabular}}
+\end{table}
+
+其中，INDEX为实验序号，FPindex为首达径在波形中出现的位置，FPaoa为首达径入射角，FPaoastd为首达径入射角标准差，FPaoaturth为首达径入射角真实值，SPindex为次达径在波形中出现的位置，SPaoa为次达径入射角，SPaoastd为次达径入射角标准差，SPaoaturth为次达径入射角真实值。从表中发现，首达径的入射角基本正确且稳定。反射径信号会由于标签距离反射面距离的增大而衰弱，进而导致多径信息提取误差变大。
+
+以上点位的对应多径时延测试结果如Table \ref{measure2} 所示。
+\begin{table}[h]
+\caption{多径时延测量}
+\vspace{0.3cm}
+\label{measure2}
+\centering
+\begin{tabular}{ccccccc}
+\toprule
+NUM &FPindex	&FPphasedifstd	&SPindex	&SPphasedifstd	&ddifturth/m	&ddif/m    \\
+\hline
+A	&8		&6.0212	&17	&11.6458	&4.2720	&4.4 \\
+B	&8		&7.3867	&15	&14.0645	&4.7170	&4.9 \\
+C	&8		&9.1460	&14	&19.2099	&5.3151	&5.5 \\
+D	&8		&13.3582	&17	&20.6693	&7.0045	&7.1 \\
+E	&8		&10.7723	&19	&21.1852	&8.5000	&8.6 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+其中，FPphasedifstd为首达径相位差的标准差，表征入射角的稳定程度，SPphasedifstd为次达径相位差的标准差，表征入射角的稳定性，ddifturth 为多径的理论距离，ddif 为多径的实际距离。表中两组数据显示，直接从信号某个点位取出的相位差误差比较明显，但是由于8天线系统对方位角敏感，因此仍然能够以较高的精度估计多径方位角。其中多径距离的估计值较为准确，误差约为$10\sim20 cm$。通过上述实验论证，基于UWB硬件平台基本可以实现多径的识别与利用，通过进一步利用多径信号提供的时延和角度信息，可以设计算法实现多径匹配。
+
+\subsubsection{NLOS融合算法分析}
+为了说明基于NLOS融合的定位算法的有效性，基于节\ref{mcpAn}的场景，使用基本的联邦卡尔曼滤波定位算法进行定位。运动过程中，直射径被铝箔纸板遮挡失效，因此产生较大的误差。人工地将右侧墙壁所反射的多径数据提取出来，仅使用此单多径信息与首达径进行融合定位，得到如图\ref{mpcResult}的定位结果
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=3.5in]{result.jpg}
+	\caption{单多径辅助定位结果对比}
+	\label{mpcResult}
+\end{figure}
+可见，多径辅助的定位结果在NLOS情况下明显优于LOS定位结果，两种算法的定位结果CDF如图\ref{CDF}所示
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=3.5in]{CDF.jpg}
+	\caption{单多径辅助定位CDF}
+	\label{CDF}
+\end{figure}
+以上实验结果说明,单多径情况下NLOS辅助定位结果即可对超宽带多天线单基站定位系统的性能与鲁棒性有明显提升，本项目所研究内容、算法具有显著实用性意义。
+
+\subsection{项目时间计划}
+
+基于以上实验分析结论，下一步将完成第二、三阶段的目标任务，主要研究计划分为以下几个部分：
+\begin{enumerate}
+	\item $T+2\sim T+6$ 基于超宽带信道进一步分析多径提取、参数估计算法，研究多径的跟踪、聚类、关联算法，完成适应超宽带平台的多径分析算法，进行理论分析，完成性能仿真与实测验证。输出该部分代码和中期报告。包含信道特征分析与测试报告，信道分解与多径估计算法设计文档、仿真与实测报告，$N$多径关联算法设计文档、仿真与实测报告，以及相应代码。
+	\item $T+7\sim T+12$ 进一步拓展优化NLOS径定位的算法设计，相关算法挖掘精度分析、算法验证。完成相关测试平台上的实测性能验证，输出测试数据与代码，与研究报告文档。
+\end{enumerate}
+T:合同签署日
+
+
+\begin{comment}
+\begin{table}[h]
+\caption{项目时间计划}
+\vspace{0.3cm}
+\label{schedule}
+\centering
+\begin{tabular}{cccccc}
+\toprule
+\makecell[c]{项目 \\ 阶段点} &\makecell[c]{起始 \\ 时间}	&\makecell[c]{结束 \\ 时间}	&工作内容	&工作目标	&输出    \\
+\hline
+\makecell[c]{第二 \\ 阶段}	& T+1	& T+9	&  \makecell[c]{ 2.1 （T+1-T-5）完成 \\ 有LOS场景下的有额外\\ 镜面反射、散射下的 \\ SLAM 算法。\\ 2.2 （T+5-T+9）拓展 \\ 算法支持多次反射识别、 \\ 惯导、时域滤波；} &  \makecell[c]{2.1和2.2部分的 \\ 算法代码完成项目 \\ 中期报告一份，\\ 包含算法描述 \\ 、验证结果。 \\ 验证基于已有硬件 \\ 平台实测信道。 \\} & \makecell[c]{算法代码 \\ 中期报告}  \\
+\hline
+\makecell[c]{第三 \\ 阶段} & T+9 & T+17 & \makecell[c]{3.1 （T+9-T+14）拓展、 \\ 优化算法支持NLOS \\ 场景、协作网络、时延 \\ 差、角度差比较4TRx \\ 与8TRx的性能差。定\\ 位算法相对于现有定\\ 位技术有显著标志\\ 性增强和 \\ 技术突破。原型 \\ 机初步验证。 \\
+3.2 （T+14-T-17）进 \\ 一步拓展、优化 \\ 算法。原型机 \\ 验证、演示，原型机 \\ 能够演示4TRx与 \\ 8TRx下的性能差。 \\ 在华为提供采 \\  数下的验证、更改。}  & \makecell[c]{3.1和3.2部分 \\ 的算法代码  \\ 3.2部分的原型机 \\ 完成结项报告一 \\ 份，包含算法描 \\ 述、仿真结果 \\ 以及原型机验 \\ 证结果。} & \makecell[c]{提交设计 \\ 研究报告 \\ 文档相关 \\ 仿真平台 \\ 代码。}\\
+\bottomrule
+\multicolumn{3}{l}{注：T：合同签署日}
+\end{tabular}
+\end{table}
+\end{comment}
+
+\clearpage
+\end{CJK*}
+\end{spacing}
+\begin{spacing}{1.0}
+\begin{CJK*}{GBK}{song}
+
+
+\renewcommand\refname{参考文献}
+\bibliographystyle{plain}
+\bibliography{IEEEabrv,ref,SGroup}
+\clearpage
+
+\end{CJK*}
+\end{spacing}
+\begin{spacing}{1.5}
+\begin{CJK*}{GBK}{song}
+
+
+
+\begin{appendices}
+\section{附录}
+\subsection{研究基础}
+申请人2014年于美国麻省理工学院（MIT）电子工程与计算机科学系获得博士学位，长期从事信息系统、统计推理、网络科学、通信与信息论、优化与控制论等领域的研究。申请人与课题组主要成员的研究工作围绕移动网络协作定位，在基础理论、算法设计、资源优化三个方面取得了一系列的研究成果，为本项目的顺利开展打下较为扎实的基础。申请人的学术成果在IEEE顶级期刊（IEEE Trans. on Signal Processing等）和国际学术会议上发表论文79余篇，SCI他引483次。发表的论文荣获IEEE通信协会2012年Fred W. Ellersick年度最佳杂志论文奖，以及三次IEEE国际会议最佳论文奖；部分研究成果获美国发明专利授权两项。申请人任IEEE通信协会的无线电通讯技术委员会的副主席，担任IEEE Trans. on Wireless Communications、IEEE Communications Letters、China Communications等期刊定位方向的编委，并多次担任国际学术会议的分会联合主席，其中包括2018年IEEE Globecom的通信分会、2016年IEEE Globecom的信号处理分会、2016年至2018年连续三年IEEE ICC的网络定位与导航Workshop等。另外，申请人在2016年和2017年的IEEE ICCC上作了关于近代定位技术的专题教程讲座。
+与本课题相关的研究基础工作包括以下方面:
+
+\textbf{1. 网络协作定位的理论基础}
+
+为解决复杂环境下实时高精度的定位需求，申请人前期的工作提出了网络协作的新架构，通过移动节点间的协作和信息分享使更多节点能定位并提升定位性能。新架构可以在不需要额外基础设施和硬件开销的条件下大幅提高定位的精度、可靠性和覆盖范围。这项工作建立了协作定位的理论，论证了网络协作能大幅提高定位的性能，并开发了等效定位信息的数学分析方法。这些新的理论和方法为网络定位领域的进一步研究和设计提供有力的工具，为本课题的理论分析提供了重要借鉴。
+
+主要成果：
+
+[1]	Liu, Y., Shen, Y., Guo, D., and Win, M. Z. (2018). Network localization and synchronization using full-duplex radios. IEEE Transactions on Signal Processing, 66(3), 714-728.
+
+[2]	Han, Y., Shen, Y., Zhang, X. P., Win, M. Z., and Meng, H. (2016). Performance Limits and Geometric Properties of Array Localization. IEEE Transactions on Information Theory, 62(2), 1054-1075.
+
+[3]	Shen, Y., Mazuelas, S., and Win, M. Z. (2012). Network navigation: Theory and interpretation. IEEE Journal on Selected Areas in Communications, 30(9), 1823-1834.
+
+[4]	Shen, Y., Wymeersch, H., and Win, M. Z. (2010). Fundamental limits of wideband localization—Part II: Cooperative networks. IEEE Transactions on Information Theory, 56(10), 4981-5000.
+
+[5]	Shen, Y., and Win, M. Z. (2010). Fundamental limits of wideband localization—Part I: A general framework. IEEE Transactions on Information Theory, 56(10), 4956-4980.
+
+\textbf{2. 低时延和计算复杂度的网络定位算法}
+
+分布式网络中，移动节点的定位信息融合旨在利用自身的测量信息与邻居节点的协作信息推测自身位置。为降低协作定位网络中的通信和计算开销，申请人前期的工作提出了以置信压缩为基础的网络信息融合机制，优化了网络中的时序调度算法，并设计了一种基于波束空间的低通信开销的定位算法。这些新技术可以大幅降低网络信息融合的计算复杂度和通信开销，为低时延网络信息融合提供了新的优化设计思路，为本项目定位算法的设计提供借鉴。
+
+主要成果：
+
+[1]	Liu, Y., Shen, Y., Guo, D., and Win, M. Z. (2018). Network localization and synchronization using full-duplex radios. IEEE Transactions on Signal Processing, 66(3), 714-728.
+
+[2]	Zhao H., Zhang L. and Shen Y. (2018, May). On the optimal beamspace design for direct localization systems. In Communications (ICC), 2018 IEEE International Conference on (pp. 1-6). IEEE.
+
+[3]	Wang T., Shen Y., Conti A. and Win M. Z. (2017), Network navigation with scheduling: Error evolution, IEEE Transactions on Information Theory, 63(11), 7509-7534.
+
+[4]	Dai, W., Shen, Y., and Win, M. Z. (2015). Energy-efficient network navigation algorithms. IEEE Journal on Selected Areas in Communications, 33(7), 1418-1430.
+
+[5]	Mazuelas, S., Shen, Y., and Win, M. Z. (2013). Belief condensation filtering. IEEE Transactions on Signal Processing, 61(18), 4403-4415.
+
+\textbf{3. 定位网络中的资源优化方法}
+
+由于频谱资源和移动设备储能的约束，移动网络在协作完成节点定位时需尽可能地降低网络资源的开销。申请人前期的工作提出了以网络定位性能为目标的资源分配方案，并针对不确定的网络参数开发了高效、鲁棒的资源分配方法。这项工作中所设计的算法能够大幅降低网络定位中频谱和能量的消耗。同时，发掘了诸如定位、信息融合等任务性能指标的函数性质及其对应的网络结构，为协同网络中的高效资源分配提供了理论基础。这些研究基础明确了网络定位中资源对性能的影响机理，为本项目中的阵列定位算法提供借鉴。
+
+主要成果：
+
+[1]	Shen, Y., Dai, W., and Win, M. Z. (2014). Power optimization for network localization. IEEE/ACM Transactions on Networking, 22(4), 1337-1350.
+
+[2]	Liu Y., Wang J., and Shen Y. (2018, May). UAV-Aided High-Accuracy Relative Localization of Ground Vehicles. In Communications (ICC), 2018 IEEE International Conference on (pp. 1-6). IEEE.
+
+[3]	Li, W. W. L., Shen, Y., Zhang, Y. J., and Win, M. Z. (2013). Robust power allocation for energy-efficient location-aware networks. IEEE/ACM Transactions on Networking (TON), 21(6), 1918-1930.
+
+[4]	Dai W., Shen Y. and Win M. Z. (2018). A Computational Geometry Framework for Efficient Network Localization. IEEE Transactions on Information Theory, 64(2), 1317-1339.
+
+[5]	Dai, W., Shen, Y., and Win, M. Z. (2015). Distributed power allocation for cooperative wireless network localization. IEEE Journal on Selected Areas in Communications, 33(1), 28-40.
+
+\textbf{4. 宽带与窄带雷达波束设计算法}
+
+课题主要参与人前期研究了基于最小化积分旁瓣水平的MIMO雷达宽/窄波束设计，提出了扩展的瑞利商最小化定理，针对奇异矩阵秩的不同情形分别给出了最优闭式解析解。此外，还提出了面向目标随机出现检测问题下的波形系数差矩阵设计算法，并从理论上分析了MIMO雷达的发/收参数（发射天线数目、发射波形数目以及接收天线数目）对目标检测性能的影响。这部分研究基础与课题内容有相关性，具有参考价值。
+
+主要成果：
+
+[1]	H. Xu, R. S. Blum, J. Wang, and J. Yuan, "Colocated MIMO radar waveform design for transmit beampattern formation", IEEE Transactions on Aerospace and Electronic Systems, vol. 51, no. 2, pp. 1558 - 1568, April 2015.
+
+[2]	H. Xu, J. Wang, J. Yuan, and X. Shan, "Colocated MIMO radar transmit beamspace design for randomly present target detection", IEEE signal processing letters, vol. 22, no. 7, pp. 828 - 832, July 2015.
+
+[3]	H. Xu, J. Wang, J. Yuan, C. Jiang, and C. Zhang, “Generalized RQ Minimization with Applications in Array Transmit Beamforming”, IEEE Antennas and Wireless Propagation Letters, pp.177-180, May 2016.
+
+\textbf{5. 超宽带定位实验平台}
+
+申请人团队基于STM32已开发了两套基于IR-UWB的测距、定位平台，可以完成UWB信号传输、信道侦听、用户定位和追踪等功能。基于天线阵列的定位系统采用到达时间、到达时间差、到达相位差融合测距方法和抗非视距定位算法，对移动标签进行实时定位，具有分米级定位精度，定位频率可达50Hz。 基于超宽带的室内无线定位网络能够完成全网络同步，配合滤波算法能够完成精准的定位和追踪，定位精度可达厘米级。
+
+在本项目中，申请人课题组将在先期建立的网络协作定位理论、算法和硬件平台基础上，探索基于多天线的单站SLAM定位技术，进而设计低时延、高效能的定位算法。申请人的课题组现已围绕与本课题相关的几个理论及技术问题进行了深入探索。这部分研究基础与硬件平台基础与课题内容有密切相关性，具有重要参考价值。
+
+\subsection{工作条件}
+
+申请人课题组所在的清华大学电子工程系现拥有微波与数字通信国家重点实验室、集成光电子学国家重点联合实验室清华大学实验区、智能技术与系统国家重点实验室智能图形图像分室等三个国家级实验室，是国内最早从事电子科学和信息科学与技术领域的教学和科研单位之一。长期从事包括基础理论、应用技术以及系统工程在内的科学研究工作，承担和完成了大量国家自然科学基金、高技术研究、攻关项目以及来自工业界的研究课题，已形成多个有自己特色的学科优势，在国内外有广泛的影响。课题组所隶属的电子工程系信息系统研究所在相关学科有着长期的研究积累和专业的研究队伍，有着良好的学术研究氛围、工作环境，以及优秀的本科生和研究生。申请人可以借助相关资源和人员基础，更顺利地开展本课题的研究工作。
+申请人课题组也与世界多所高校和研究机构通信与网络等领域的教授长期保持研究合作和学术交流关系，包括美国麻省理工学院的M. Z. Win和S. Mitter教授、美国南加州大学的A. Molisch教授、美国西北大学的D. Guo教授、意大利博洛尼亚大学的A. Conti教授、香港中文大学的Y.-J. Zhang教授等。这些合作和交流有利于申请人及时了解科研前沿，并保障本课题最终成果的水准。
+
+本课题主要为机理和实验性研究，侧重于算法设计和实验验证，不需要其他大型的实验仪器。实验验证中所需要的超宽带阵列拟采购DecaWave公司DW1000芯片，拟自行搭建配套系统并基于自主开发的实验平台实现所设计的功能。整个实验验证系统搭建的开销适中，可以完全由项目的经费支持。
+
+
+
+\end{appendices}
+
+
+
+\end{CJK*}
+\end{spacing}
+
+
+ \end{document}

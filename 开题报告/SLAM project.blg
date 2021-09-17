@@ -1,0 +1,74 @@
+This is BibTeX, Version 0.99d (TeX Live 2020/W32TeX)
+Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
+The top-level auxiliary file: SLAM project.aux
+The style file: plain.bst
+Database file #1: IEEEabrv.bib
+Database file #2: ref.bib
+You're missing a field name---line 75 of file ref.bib
+ :  
+ :  %keywords={车联网定位;相对定位;几何约束;TOA;非线性规划;罚函数法;POWELL算法},
+(Error may have been on previous line)
+I'm skipping whatever remains of this entry
+You're missing a field name---line 87 of file ref.bib
+ :  
+ :  % keywords={车联网;定位方法;定位机制},
+(Error may have been on previous line)
+I'm skipping whatever remains of this entry
+You're missing a field name---line 112 of file ref.bib
+ :  
+ :  %abstract={通过对基站定位技术的综合研究,旨在将基站定位技术应用于高速公路车辆位置服务中.通过高速公路上车辆行驶经过连续不同的基站,提出一种针对高速公路车辆位置定位的算法,能够有效地推算出车辆的行驶方向轨迹,结合单基站所覆盖范围与高速公路形成的几何图形,利用几何关系综合分析出高速公路上车辆的行驶方向及位置.},
+(Error may have been on previous line)
+I'm skipping whatever remains of this entry
+Database file #3: SGroup.bib
+You're missing a field name---line 199 of file SGroup.bib
+ :   
+ :   %journal={Industry Applications IEEE Transactions on},
+(Error may have been on previous line)
+I'm skipping whatever remains of this entry
+I was expecting a `,' or a `}'---line 3228 of file SGroup.bib
+ :   journal       = IEEE 
+ :                        Journal of Selected Topics in Signal Processing,
+I'm skipping whatever remains of this entry
+Warning--there's a number but no volume in vo2015multitarget
+You've used 31 entries,
+            2118 wiz_defined-function locations,
+            1061 strings with 17831 characters,
+and the built_in function-call counts, 13077 in all, are:
+= -- 1320
+> -- 649
+< -- 12
++ -- 261
+- -- 224
+* -- 989
+:= -- 2088
+add.period$ -- 102
+call.type$ -- 31
+change.case$ -- 205
+chr.to.int$ -- 0
+cite$ -- 32
+duplicate$ -- 464
+empty$ -- 972
+format.name$ -- 224
+if$ -- 2762
+int.to.chr$ -- 0
+int.to.str$ -- 31
+missing$ -- 31
+newline$ -- 158
+num.names$ -- 62
+pop$ -- 200
+preamble$ -- 1
+purify$ -- 174
+quote$ -- 0
+skip$ -- 339
+stack$ -- 0
+substring$ -- 963
+swap$ -- 136
+text.length$ -- 12
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 124
+warning$ -- 1
+while$ -- 125
+width$ -- 33
+write$ -- 352
+(There were 5 error messages)
